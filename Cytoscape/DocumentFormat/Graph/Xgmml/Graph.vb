@@ -37,22 +37,22 @@ Namespace DocumentFormat.CytoscapeGraphView
         <XmlIgnore>
         Public Property NetworkMetaData As DocumentElements.NetworkMetadata
             Get
-                If _attrs.ContainsKey(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) Then
-                    Return _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA).RDF.meta
+                If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
+                    Return _attrs(ATTR_NAME_NETWORK_METADATA).RDF.meta
                 Else
                     Return Nothing
                 End If
             End Get
             Set(value As DocumentElements.NetworkMetadata)
-                If _attrs.ContainsKey(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) Then
-                    _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA).RDF =
+                If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
+                    _attrs(ATTR_NAME_NETWORK_METADATA).RDF =
                         New DocumentElements.InnerRDF With {
                             .meta = value
                     }
                 Else
-                    _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) =
+                    _attrs(ATTR_NAME_NETWORK_METADATA) =
                         New GraphAttribute With {
-                            .Name = DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA,
+                            .Name = ATTR_NAME_NETWORK_METADATA,
                             .RDF = New DocumentElements.InnerRDF With {
                                 .meta = value
                         }
@@ -127,16 +127,14 @@ Namespace DocumentFormat.CytoscapeGraphView
         ''' <remarks></remarks>
         Public Shared Function Load(path As String) As Graph
             Dim graph As Graph = path.LoadXml(Of Graph)(preprocess:=AddressOf RDFXml.TrimRDF)
-            '     Dim MetaData As String = Regex.Match(XmlBuilder.ToString, "<rdf:RDF>.+</rdf:RDF>", RegexOptions.Singleline).Value
-            '    graph.NetworkMetaData = DocumentElements.NetworkMetadata.LoadDocument(RDFDoc:=MetaData)
             graph.FilePath = path
 
             Return graph
         End Function
 
-        Public Function getSize(Optional Scale As Double = 1) As Size
-            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.Graphics.x).ToArray.Max * (Scale + 1)
-            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.Graphics.y).ToArray.Max * (Scale + 1)
+        Public Function GetSize(Optional Scale As Double = 1) As Size
+            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.Graphics.x).Max * (Scale + 1)
+            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.Graphics.y).Max * (Scale + 1)
 
             Return New Size(Max_X, Max_Y)
         End Function
@@ -147,7 +145,7 @@ Namespace DocumentFormat.CytoscapeGraphView
                 Dim height = Me.Graphics("NETWORK_HEIGHT")
 
                 If width Is Nothing OrElse height Is Nothing Then
-                    Return getSize()
+                    Return GetSize()
                 Else
                     Return New Size(Val(width.Value), Val(height.Value))
                 End If
@@ -192,7 +190,7 @@ Namespace DocumentFormat.CytoscapeGraphView
             Dim sw As Stopwatch = Stopwatch.StartNew
 
             Call $"{NameOf(Edges)}:={Edges.Count } in the network model...".__DEBUG_ECHO
-            Me.Edges = DocumentElements.Edge.Distinct(Me.Edges)
+            Me.Edges = Distinct(Me.Edges)
             Call $"{NameOf(Edges)}:={Edges.Count } left after remove duplicates in {sw.ElapsedMilliseconds}ms....".__DEBUG_ECHO
             Return Me
         End Function

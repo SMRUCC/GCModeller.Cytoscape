@@ -124,7 +124,7 @@ Namespace DocumentFormat.CytoscapeGraphView
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function InvokeDrawing(Graph As Graph, refMap As ReferenceMapData, map As String(), Optional Size As String = "", Optional alpha As Integer = 255, Optional Scale As Double = 1) As Image
-            Dim _size As Size = If(String.IsNullOrEmpty(Size), Graph.getSize(Scale), New Size(Val(Size.Split(CChar(",")).First), Val(Size.Split(CChar(",")).Last)))
+            Dim _size As Size = If(String.IsNullOrEmpty(Size), Graph.GetSize(Scale), New Size(Val(Size.Split(CChar(",")).First), Val(Size.Split(CChar(",")).Last)))
             Dim Gr = _size.CreateGDIDevice
             Dim offset As Point = New Point(30, 35)
 

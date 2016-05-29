@@ -6,7 +6,7 @@ Namespace DocumentFormat.Tables
         Public Property SUID As Integer
         Public Property Confidence As Double
         Public Property EdgeBetweenness As Double
-        <Column("interaction	name")> Public Property Interaction As String
+        <Column("interaction name")> Public Property Interaction As String
         <Column("shared interaction")> Public Property SharedInteraction As String
         <Column("shared name")> Public Property SharedName As String
 

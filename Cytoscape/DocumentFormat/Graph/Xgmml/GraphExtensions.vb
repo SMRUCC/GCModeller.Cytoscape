@@ -55,7 +55,7 @@ Namespace DocumentFormat.CytoscapeGraphView
 
         <Extension>
         Private Function __setValue(attr As Attribute, values As String()) As Attribute
-            If String.Equals(attr.Type, Attribute.ATTR_VALUE_TYPE_REAL) Then
+            If String.Equals(attr.Type, ATTR_VALUE_TYPE_REAL) Then
                 attr.Value = (From s As String In values Select Val(s)).Min
             Else
                 attr.Value = String.Join("; ", values)
