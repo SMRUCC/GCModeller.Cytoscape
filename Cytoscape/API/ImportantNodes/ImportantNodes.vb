@@ -7,6 +7,7 @@ Imports Microsoft.VisualBasic.Scripting.MetaData
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.Linq
 Imports System.Runtime.CompilerServices
+Imports Microsoft.VisualBasic.Language
 
 Namespace API.ImportantNodes
 
@@ -23,17 +24,22 @@ Namespace API.ImportantNodes
         <ExportAPI("Read.Csv.RegulationEdges")>
         Public Function ReadRegulations(path As String) As RegulatorRegulation()
             Dim inBuf As IEnumerable(Of Regulations) = path.LoadCsv(Of Regulations)(False)
-            Dim allORFs As String() = (From item In inBuf Select item.ORF Distinct).ToArray
-            Return (From ORF As String In allORFs.AsParallel
-                    Let Regulators As String() = (From x As Regulations In inBuf
-                                                  Where String.Equals(x.ORF, ORF)
-                                                  Select x.Regulator
-                                                  Distinct).ToArray
-                    Let rel As RegulatorRegulation = New RegulatorRegulation With {
-                        .LocusId = ORF,
-                        .Regulators = Regulators
-                    }
-                    Select rel).ToArray
+            Dim allORFs As String() =
+                LinqAPI.Exec(Of String) <= From reg As Regulations
+                                           In inBuf
+                                           Select reg.ORF
+                                           Distinct
+            Return LinqAPI.Exec(Of RegulatorRegulation) <=
+                From ORF As String
+                In allORFs.AsParallel
+                Let Regulators As String() = (From x As Regulations In inBuf
+                                              Where String.Equals(x.ORF, ORF)
+                                              Select x.Regulator
+                                              Distinct).ToArray
+                Select New RegulatorRegulation With {
+                    .LocusId = ORF,
+                    .Regulators = Regulators
+                }
         End Function
 
         ''' <summary>
@@ -86,22 +92,33 @@ Namespace API.ImportantNodes
 
         <ExportAPI("Write.Csv.Nodes.Important")>
         Public Function SaveResult(data As IEnumerable(Of KeyValuePair(Of Integer, Node())), saveCsv As String) As Boolean
-            Dim Csv As DocumentStream.File = New DocumentStream.File From {New String() {"Rank", "ImportantNodes"}}
-            Csv += (From item In data.AsParallel Let Rank = item.Key
-                    Let Nodes As String = String.Join("; ", (From n In item.Value Select n.SharedName).ToArray)
-                    Let Row As DocumentStream.RowObject = {CStr(Rank), Nodes}.ToCsvRow
-                    Select Row
-                    Order By Val(Row.First) Ascending).ToArray
-            Return Csv.Save(saveCsv, False)
+            Dim LQuery = From x In data.AsParallel
+                         Let Rank As Integer = x.Key
+                         Select Rank,
+                             importantNode = (From n As Node
+                                              In x.Value
+                                              Select n.SharedName).ToArray
+                         Order By Rank Ascending
+            Return LQuery.ToArray.SaveTo(saveCsv, False)
         End Function
 
         <ExportAPI("read.csv.rank_nodes")>
         Public Function ReadRankedNodes(path As String) As KeyValuePair(Of Integer, Node())()
-            Dim CsvData = path.LoadCsv(Of NodeRank)(False)
-            Return (From x As NodeRank
-                    In CsvData.AsParallel
-                    Let nodes = (From name As String In x.Nodes Select New Node With {.SharedName = name}).ToArray
-                    Select New KeyValuePair(Of Integer, Node())(x.Rank, nodes)).ToArray
+            Dim data As IEnumerable(Of NodeRank) = path.LoadCsv(Of NodeRank)(False)
+            Return LinqAPI.Exec(Of KeyValuePair(Of Integer, Node())) <=
+                From x As NodeRank
+                In data.AsParallel
+                Let nodes As Node() = x.Nodes.__nodes
+                Select New KeyValuePair(Of Integer, Node())(x.Rank, nodes)
+        End Function
+
+        <Extension>
+        Private Function __nodes(nodes As String()) As Node()
+            Return LinqAPI.Exec(Of Node) <= From name As String
+                                            In nodes
+                                            Select New Node With {
+                                                .SharedName = name
+                                            }
         End Function
 
         ''' <summary>
