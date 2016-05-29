@@ -123,6 +123,7 @@
     <Compile Include="DocumentFormat\Graph\Visualization\Node.vb" />
     <Compile Include="DocumentFormat\Graph\Serialization\GraphicsMapper.vb" />
     <Compile Include="DocumentFormat\Graph\Xgmml\Attributes.vb" />
+    <Compile Include="DocumentFormat\Graph\Xgmml\GraphExtensions.vb" />
     <Compile Include="DocumentFormat\Graph\Xgmml\RDFXml.vb" />
     <Compile Include="DocumentFormat\Graph\Xgmml\Graphics.vb" />
     <Compile Include="DocumentFormat\Graph\Xgmml\EdgeGraphics.vb" />

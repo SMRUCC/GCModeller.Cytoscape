@@ -41,41 +41,6 @@ Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
                 Return dt.Max * 1000000 + dt.Min
             End Get
         End Property
-
-        Public Shared Function Distinct(Edges As Edge()) As Edge()
-            Dim LQuery = (From edge In Edges Select edge Group edge By edge.__internalUID Into Group).ToArray
-            Dim edgesBuffer = (From gr In LQuery.AsParallel Select MergeEdges(gr.Group.ToArray)).ToArray.AddHandle.ToArray
-            Return edgesBuffer
-        End Function
-
-        Private Shared Function MergeEdges(edges As Edge()) As Edge
-            If edges.Count = 1 Then
-                Return edges.First
-            End If
-
-            Dim First = edges.First
-            First.Attributes = MergeAttributes((From obj In edges Select obj.Attributes).ToArray.MatrixToVector)
-
-            Return First
-        End Function
-
-        Private Shared Function MergeAttributes(attrs As Attribute()) As Attribute()
-            Dim LQuery = (From attr In attrs Select attr Group attr By attr.Name Into Group).ToArray
-            Dim attrsBuffer = (From gr In LQuery Select gr.Group.First, values = (From obj In gr.Group Select obj.Value Distinct).ToArray).ToArray
-            Dim result = (From obj In attrsBuffer Select setMergedAttributeValue(obj.First, obj.values)).ToArray
-            Return result
-        End Function
-
-        Private Shared Function setMergedAttributeValue(attr As Attribute, values As String()) As Attribute
-            If String.Equals(attr.Type, Attribute.ATTR_VALUE_TYPE_REAL) Then
-                attr.Value = (From s As String In values Select Val(s)).ToArray.Min
-            Else
-                attr.Value = String.Join("; ", values)
-            End If
-
-            Return attr
-        End Function
-
 #Region "IDisposable Support"
         Private disposedValue As Boolean ' To detect redundant calls
 

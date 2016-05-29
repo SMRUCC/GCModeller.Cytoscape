@@ -119,5 +119,4 @@ Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
         End Sub
 #End Region
     End Class
-
 End Namespace

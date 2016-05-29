@@ -7,6 +7,10 @@ Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
 
     Public Class InnerRDF
         <XmlElement("rdf-Description")> Public Property meta As NetworkMetadata
+
+        Public Overrides Function ToString() As String
+            Return meta.GetJson
+        End Function
     End Class
 
     Public Class NetworkMetadata : Inherits RDFEntity
