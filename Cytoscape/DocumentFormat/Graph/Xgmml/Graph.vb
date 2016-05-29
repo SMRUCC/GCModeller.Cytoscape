@@ -1,0 +1,211 @@
+﻿Imports System.Drawing
+Imports System.Text
+Imports System.Xml.Serialization
+Imports System.Text.RegularExpressions
+Imports Microsoft.VisualBasic.ComponentModel
+Imports Microsoft.VisualBasic.Language
+
+Namespace DocumentFormat.CytoscapeGraphView
+
+    ''' <summary>
+    ''' The Cytoscape software XML format network visualization model.(Cytoscape软件的网络XML模型文件)
+    ''' </summary>
+    ''' <remarks>请注意，由于在Cytoscape之中，每一个Xml元素都是小写字母的，所以在这个类之中的所有的Xml序列化的标记都不可以再更改大小写了</remarks>
+    <XmlRoot("graph", Namespace:="http://www.cs.rpi.edu/XGMML")>
+    Public Class Graph : Inherits ITextFile
+        Implements ISaveHandle
+
+#Region "Assembly File Public Properties"
+
+        <XmlAttribute("id")> Public Property ID As String
+        ''' <summary>
+        ''' The brief title information of this cytoscape network model.(这个Cytoscape网络模型文件的摘要标题信息)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        <XmlAttribute("label")> Public Property Label As String
+        ''' <summary>
+        ''' The edges between these nodes have the direction from one node to another node?
+        ''' (这个网络模型文件之中的相互作用的节点之间的边是否是具有方向性的)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        <XmlAttribute("directed")> Public Property Directed As String
+        <XmlAttribute("cy-documentVersion")> Public Property documentVersion As String
+        <XmlIgnore>
+        Public Property NetworkMetaData As DocumentElements.NetworkMetadata
+            Get
+                If _attrs.ContainsKey(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) Then
+                    Return _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA).RDF.meta
+                Else
+                    Return Nothing
+                End If
+            End Get
+            Set(value As DocumentElements.NetworkMetadata)
+                If _attrs.ContainsKey(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) Then
+                    _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA).RDF =
+                        New DocumentElements.InnerRDF With {
+                            .meta = value
+                    }
+                Else
+                    _attrs(DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA) =
+                        New GraphAttribute With {
+                            .Name = DocumentElements.Attribute.ATTR_NAME_NETWORK_METADATA,
+                            .RDF = New DocumentElements.InnerRDF With {
+                                .meta = value
+                        }
+                    }
+                End If
+            End Set
+        End Property
+
+        <XmlElement("att")> Public Property Attributes As GraphAttribute()
+            Get
+                If _attrs.IsNullOrEmpty Then
+                    Return New GraphAttribute() {}
+                End If
+
+                Return _attrs.Values.ToArray
+            End Get
+            Set(value As GraphAttribute())
+                If value.IsNullOrEmpty Then
+                    _attrs = New Dictionary(Of GraphAttribute)
+                Else
+                    _attrs = value.ToDictionary
+                End If
+            End Set
+        End Property
+        <XmlElement("graphics")> Public Property Graphics As Graphics
+        <XmlElement("node")> Public Property Nodes As DocumentElements.Node()
+            Get
+                If _nodeList.IsNullOrEmpty Then
+                    Return New DocumentElements.Node() {}
+                End If
+                Return _nodeList.Values.ToArray
+            End Get
+            Set(value As DocumentElements.Node())
+                If value.IsNullOrEmpty Then
+                    _nodeList = New Dictionary(Of String, DocumentElements.Node)
+                Else
+                    _nodeList = value.ToDictionary(Function(obj) obj.label)
+                End If
+            End Set
+        End Property
+
+        <XmlElement("edge")> Public Property Edges As DocumentElements.Edge()
+
+        Dim _attrs As Dictionary(Of GraphAttribute)
+        Dim _nodeList As Dictionary(Of String, DocumentElements.Node)
+#End Region
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="Label">Synonym</param>
+        ''' <returns></returns>
+        Public Function GetNode(Label As String) As DocumentElements.Node
+            Dim Node As DocumentElements.Node = Nothing
+            Call _nodeList.TryGetValue(Label, Node)
+            Return Node
+        End Function
+
+        Public Function GetNode(ID As Long) As DocumentElements.Node
+            Return LinqAPI.DefaultFirst(Of DocumentElements.Node) <=
+                From node As DocumentElements.Node
+                In Me._nodeList.Values
+                Where node.id = ID
+                Select node
+        End Function
+
+        ''' <summary>
+        ''' 使用这个方法才能够正确的加载一个cytoscape的网络模型文件
+        ''' </summary>
+        ''' <param name="path"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function Load(path As String) As Graph
+            Dim graph As Graph = path.LoadXml(Of Graph)(preprocess:=AddressOf RDFXml.TrimRDF)
+            '     Dim MetaData As String = Regex.Match(XmlBuilder.ToString, "<rdf:RDF>.+</rdf:RDF>", RegexOptions.Singleline).Value
+            '    graph.NetworkMetaData = DocumentElements.NetworkMetadata.LoadDocument(RDFDoc:=MetaData)
+            graph.FilePath = path
+
+            Return graph
+        End Function
+
+        Public Function getSize(Optional Scale As Double = 1) As Size
+            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.Graphics.x).ToArray.Max * (Scale + 1)
+            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.Graphics.y).ToArray.Max * (Scale + 1)
+
+            Return New Size(Max_X, Max_Y)
+        End Function
+
+        Public ReadOnly Property Size As Size
+            Get
+                Dim width = Me.Graphics("NETWORK_WIDTH")
+                Dim height = Me.Graphics("NETWORK_HEIGHT")
+
+                If width Is Nothing OrElse height Is Nothing Then
+                    Return getSize()
+                Else
+                    Return New Size(Val(width.Value), Val(height.Value))
+                End If
+            End Get
+        End Property
+
+        ''' <summary>
+        ''' 创建一个初始默认的网络文件
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overloads Shared Function CreateObject() As Graph
+            Dim Graph As New Graph With {
+                .Label = "",
+                .ID = "",
+                .Directed = "1",
+                .NetworkMetaData = New DocumentElements.NetworkMetadata
+            }
+            Return Graph
+        End Function
+
+        Public Function ExistEdge(Edge As DocumentElements.Edge) As Boolean
+            Return Not (GetNode(Edge.source) Is Nothing OrElse GetNode(Edge.target) Is Nothing)
+        End Function
+
+        ''' <summary>
+        ''' Creates a default cytoscape network model xml file with specific title and description.(创建一个初始默认的网络文件)
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overloads Shared Function CreateObject(Title As String, Type As String, Optional Description As String = "") As Graph
+            Dim Graph As Graph = Graph.CreateObject
+
+            Graph.Label = Title
+            Graph.NetworkMetaData.Title = Title.Replace("<", "[").Replace(">", "]")
+            Graph.NetworkMetaData.InteractionType = Type.Replace("<", "[").Replace(">", "]")
+            Graph.NetworkMetaData.Description = Description.Replace("<", "[").Replace(">", "]")
+            Return Graph
+        End Function
+
+        Public Function DeleteDuplication() As Graph
+            Dim sw As Stopwatch = Stopwatch.StartNew
+
+            Call $"{NameOf(Edges)}:={Edges.Count } in the network model...".__DEBUG_ECHO
+            Me.Edges = DocumentElements.Edge.Distinct(Me.Edges)
+            Call $"{NameOf(Edges)}:={Edges.Count } left after remove duplicates in {sw.ElapsedMilliseconds}ms....".__DEBUG_ECHO
+            Return Me
+        End Function
+
+        ''' <summary>
+        ''' Save this cytoscape network visualization model using this function.(请使用这个方法进行Cytoscape网络模型文件的保存)
+        ''' </summary>
+        ''' <param name="FilePath">The file path of the xml file saved location.</param>
+        ''' <param name="encoding">The text encoding of saved text file.</param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Overrides Function Save(Optional FilePath As String = "", Optional encoding As Encoding = Nothing) As Boolean Implements ISaveHandle.Save
+            Return WriteXml(Me.GetXml, Encodings.UTF8.GetEncodings, getPath(FilePath))
+        End Function
+    End Class
+End Namespace
