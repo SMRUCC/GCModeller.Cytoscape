@@ -101,37 +101,37 @@ Public Module ShellScriptAPI
 
         Dim Graph As Graph = Graph.CreateObject(RefMap.Name.Replace("<br>", ""), "KEGG reference map data", RefMap.Description.Replace("<br>", ""))
         Graph.ID = RefMap.EntryId
-        Graph.LabelTitle = RefMap.Name
+        Graph.Label = RefMap.Name
         Graph.Nodes = (From rxn In Reaction
                        Let InternalAttr = New DocumentElements.Attribute() {
                            New DocumentElements.Attribute With {
                                 .Name = "KEGG_ENTRY",
-                                .Type = DocumentElements.Attribute.ATTR_VALUE_TYPE_STRING,
+                                .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Entry
                            },
                            New DocumentElements.Attribute With {
                                 .Name = "Equation",
-                                .Type = DocumentElements.Attribute.ATTR_VALUE_TYPE_STRING,
+                                .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Equation
                            },
                            New DocumentElements.Attribute With {
                                 .Name = "EC",
-                                .Type = DocumentElements.Attribute.ATTR_VALUE_TYPE_STRING,
+                                .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.EcNum
                            },
                            New DocumentElements.Attribute With {
                                 .Name = "def",
-                                .Type = DocumentElements.Attribute.ATTR_VALUE_TYPE_STRING,
+                                .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Definition
                            },
                            New DocumentElements.Attribute With {
                                 .Name = "comments",
-                                .Type = DocumentElements.Attribute.ATTR_VALUE_TYPE_STRING,
+                                .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Comments
                            }
                        }
                        Select New DocumentElements.Node With {
-                           .LabelTitle = rxn.ID,
+                           .label = rxn.ID,
                            .Attributes = InternalAttr
                            }).ToArray.AddHandle
 
@@ -142,8 +142,8 @@ Public Module ShellScriptAPI
                                                                 Select source.Identifier).ToArray
                                     Where Not Compound.IsNullOrEmpty
                                     Select New DocumentElements.Edge With {
-                                        .source = Graph.GetNode(rxn.ID).IDPointer,
-                                        .target = Graph.GetNode(target.ID).IDPointer,
+                                        .source = Graph.GetNode(rxn.ID).id,
+                                        .target = Graph.GetNode(target.ID).id,
                                         .Label = Compound.First}).ToArray
                        Select Edges).ToArray.MatrixToVector.AddHandle '从rxn的右边到target的左边形成一条边
         Return Graph

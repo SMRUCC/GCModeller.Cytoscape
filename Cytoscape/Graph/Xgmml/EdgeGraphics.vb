@@ -3,7 +3,7 @@ Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.Imaging
 
-Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
+Namespace CytoscapeGraphView.XGMML
 
     Public Class EdgeGraphics : Inherits AttributeDictionary
 

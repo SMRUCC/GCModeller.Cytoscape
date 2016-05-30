@@ -1,46 +1,36 @@
 ﻿Imports System.Drawing
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
+Imports Microsoft.VisualBasic.Imaging
+Imports Microsoft.VisualBasic.Linq
 
-Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
+Namespace CytoscapeGraphView.XGMML
 
-    <XmlType("edge")>
-    Public Class Edge : Inherits AttributeDictionary
+    <XmlType("node")>
+    Public Class Node : Inherits AttributeDictionary
         Implements IAddressHandle
 
-        <XmlAttribute("id")> Public Property Id As Integer Implements IAddressHandle.Address
-        <XmlAttribute("label")> Public Property Label As String
-        <XmlElement("graphics")> Public Property Graphics As EdgeGraphics
-        <XmlAttribute("source")> Public Property source As Long
-        <XmlAttribute("target")> Public Property target As Long
-
-        Public Function ContainsNode(id As Long) As Boolean
-            Return source = id OrElse target = id
-        End Function
-
-        Public Function ContainsOneOfNode(Id As Integer()) As Boolean
-            For Each handle In Id
-                If source = handle OrElse target = handle Then
-                    Return True
-                End If
-            Next
-            Return False
-        End Function
-
-        Public Overrides Function ToString() As String
-            Return String.Format("{0} ""{1}""", Id, Label)
-        End Function
-
         ''' <summary>
-        ''' 应用于节点的去重
+        ''' 当前的这个节点在整个网络的节点列表之中的位置
         ''' </summary>
+        ''' <value></value>
         ''' <returns></returns>
-        Protected Friend ReadOnly Property __internalUID As Long
+        ''' <remarks></remarks>
+        <XmlAttribute> Public Property id As Integer Implements IAddressHandle.Address
+        <XmlAttribute> Public Property label As String
+        <XmlElement("graphics")> Public Property Graphics As NodeGraphics
+
+        Public ReadOnly Property Location As Point
             Get
-                Dim dt = {source, target}
-                Return dt.Max * 1000000 + dt.Min
+                Return New Point(Graphics.x, Graphics.y)
             End Get
         End Property
+
+        Public Overrides Function ToString() As String
+            Dim array As String() = Attributes.ToArray(AddressOf Scripting.ToString)
+            Return String.Format("{0} ""{1}""  ==> {2}", id, label, String.Join("; ", array))
+        End Function
+
 #Region "IDisposable Support"
         Private disposedValue As Boolean ' To detect redundant calls
 

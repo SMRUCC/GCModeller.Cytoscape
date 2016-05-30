@@ -3,7 +3,7 @@ Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.DocumentFormat.RDF
 Imports Microsoft.VisualBasic.Serialization
 
-Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
+Namespace CytoscapeGraphView.XGMML
 
     Public Class InnerRDF
         <XmlElement("rdf-Description")> Public Property meta As NetworkMetadata

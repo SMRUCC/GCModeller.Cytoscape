@@ -9,6 +9,7 @@ Imports LANS.SystemsBiology.DatabaseServices.StringDB
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic
 Imports LANS.SystemsBiology.ComponentModel.Loci
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.DocumentFormat.CytoscapeGraphView.NameOf
 
 Namespace NetworkModel.StringDB
 
@@ -34,7 +35,7 @@ Namespace NetworkModel.StringDB
             Model.Nodes = (From GeneObject As GeneBrief
                            In PTT.GeneObjects.AsParallel
                            Select New Node With {
-                               .LabelTitle = GeneObject.Synonym,
+                               .label = GeneObject.Synonym,
                                .Attributes = __attributes(GeneObject)}).ToArray.AddHandle '使用PTT文件首先生成节点
 
             Dim Network As New List(Of Edge)
@@ -52,7 +53,7 @@ Namespace NetworkModel.StringDB
 
             Model.Edges = Network.ToArray.AddHandle
 
-            Dim nodes = Model.Nodes.ToDictionary(Function(obj) obj.IDPointer,
+            Dim nodes = Model.Nodes.ToDictionary(Function(obj) obj.id,
                                                  Function(obj) New Value(Of Integer)(0))
             For Each edge In Model.Edges
                 nodes(edge.source).Value += 1
@@ -60,13 +61,13 @@ Namespace NetworkModel.StringDB
             Next
 
             For Each node In nodes
-                Model.GetNode(node.Key).AddAttribute("Degree", node.Value.Value, Attribute.ATTR_VALUE_TYPE_REAL)
+                Model.GetNode(node.Key).AddAttribute("Degree", node.Value.Value, ATTR_VALUE_TYPE_REAL)
             Next
 
             If TrimDegree > -1 Then
 
                 Dim LQuery As Integer() = (From x In nodes Where x.Value.Value >= TrimDegree Select x.Key).ToArray
-                Model.Nodes = (From node As Node In Model.Nodes Where Array.IndexOf(LQuery, node.IDPointer) > -1 Select node).ToArray
+                Model.Nodes = (From node As Node In Model.Nodes Where Array.IndexOf(LQuery, node.id) > -1 Select node).ToArray
                 LQuery = (From item In nodes Where item.Value.Value < TrimDegree Select item.Key).ToArray
                 Model.Edges = (From edge As Edge In Model.Edges.AsParallel Where Not edge.ContainsOneOfNode(LQuery) Select edge).ToArray
             End If
@@ -79,13 +80,13 @@ Namespace NetworkModel.StringDB
             Dim source As String = itr.GetInteractor(edge.ParticipantList.First.InteractorRef).Synonym
             Dim target As String = itr.GetInteractor(edge.ParticipantList.Last.InteractorRef).Synonym
 
-            EdgeModel.source = Model.GetNode(source).IDPointer
-            EdgeModel.target = Model.GetNode(target).IDPointer
+            EdgeModel.source = Model.GetNode(source).id
+            EdgeModel.target = Model.GetNode(target).id
             EdgeModel.Label = $"{source}::{target}"
 
             Dim attrs As New List(Of Attribute)
             Call attrs.Add(New Attribute With {
-                           .Type = Attribute.ATTR_VALUE_TYPE_REAL,
+                           .Type = ATTR_VALUE_TYPE_REAL,
                            .Name = $"{NameOf(edge.ConfidenceList)}-{edge.ConfidenceList.First.Unit.Names.ShortLabel}",
                            .Value = edge.ConfidenceList.First.value})
 
@@ -93,7 +94,7 @@ Namespace NetworkModel.StringDB
 
             If Not experiment Is Nothing Then
                 Call attrs.Add(New Attribute With {
-                         .Type = Attribute.ATTR_VALUE_TYPE_STRING,
+                         .Type = ATTR_VALUE_TYPE_STRING,
                          .Name = $"{NameOf(edge.ExperimentList)}-{If(experiment.Names Is Nothing, experiment.interactionDetectionMethod.Names.ShortLabel, experiment.Names.ShortLabel)}",
                          .Value = experiment.Bibref.Xref.PrimaryReference.Db & ": " & experiment.Bibref.Xref.PrimaryReference.Id})
             End If
@@ -107,28 +108,27 @@ Namespace NetworkModel.StringDB
             Dim List As New List(Of Attribute)
 
             List += New Attribute With {
-                .Type = Attribute.ATTR_VALUE_TYPE_STRING,
+                .Type = ATTR_VALUE_TYPE_STRING,
                 .Name = NameOf(GeneBrief.Product),
                 .Value = GeneObject.Product
             }
             List += New Attribute With {
-                .Type = Attribute.ATTR_VALUE_TYPE_STRING,
+                .Type = ATTR_VALUE_TYPE_STRING,
                 .Name = NameOf(GeneBrief.PID),
                 .Value = GeneObject.PID
             }
             List += New Attribute With {
-                .Type = Attribute.ATTR_VALUE_TYPE_STRING,
+                .Type = ATTR_VALUE_TYPE_STRING,
                 .Name = NameOf(GeneBrief.COG),
                 .Value = Regex.Replace(GeneObject.COG, "COG\d+", "", RegexOptions.IgnoreCase)
             }
             List += New Attribute With {
-                .Type = Attribute.ATTR_VALUE_TYPE_STRING,
+                .Type = ATTR_VALUE_TYPE_STRING,
                 .Name = NameOf(NucleotideLocation.Strand),
                 .Value = GeneObject.Location.Strand.ToString
             }
 
             Return List.ToArray
         End Function
-
     End Module
 End Namespace

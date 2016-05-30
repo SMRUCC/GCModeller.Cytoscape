@@ -1,7 +1,7 @@
 ﻿Imports System.Xml.Serialization
-Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.DocumentFormat.Visualization.visualProperty
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.Visualization.visualProperty
 
-Namespace DocumentFormat.Visualization.DocumentNodes
+Namespace Visualization
 
     Public Class network : Inherits visualNode
     End Class

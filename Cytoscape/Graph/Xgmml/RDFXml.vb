@@ -2,7 +2,7 @@
 Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.Text.Xml
 
-Namespace DocumentFormat.CytoscapeGraphView
+Namespace CytoscapeGraphView.XGMML
 
     Module RDFXml
 

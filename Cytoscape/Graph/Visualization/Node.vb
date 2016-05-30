@@ -1,6 +1,6 @@
 ﻿Imports System.Drawing
 
-Namespace DocumentFormat.CytoscapeGraphView
+Namespace CytoscapeGraphView
 
     ''' <summary>
     ''' 一般是绘制圆形
@@ -21,13 +21,13 @@ Namespace DocumentFormat.CytoscapeGraphView
             Me.ir = r * 1.1
         End Sub
 
-        Sub New(Node As Cytoscape.DocumentFormat.CytoscapeGraphView.DocumentElements.Node, xScale As Double, yScale As Double)
+        Sub New(Node As XGMML.Node, xScale As Double, yScale As Double)
             Call Me.New(((xScale + yScale) / 3) * (Node.Graphics.w + Node.Graphics.h) / 2,
                         New Point(Node.Graphics.x * xScale, Node.Graphics.y * yScale))
             Me.NodeModel = Node
         End Sub
 
-        Public ReadOnly Property NodeModel As Cytoscape.DocumentFormat.CytoscapeGraphView.DocumentElements.Node
+        Public ReadOnly Property NodeModel As XGMML.Node
 
         ''' <summary>
         ''' 在画图的时候的圆形的正方形的绘图区域

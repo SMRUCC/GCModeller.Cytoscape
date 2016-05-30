@@ -5,7 +5,7 @@ Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
 Imports Microsoft.VisualBasic.DocumentFormat.RDF
 Imports Microsoft.VisualBasic.Language
 
-Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
+Namespace CytoscapeGraphView.XGMML
 
     ''' <summary>
     ''' 一个网络之中的对象所具备有的属性值

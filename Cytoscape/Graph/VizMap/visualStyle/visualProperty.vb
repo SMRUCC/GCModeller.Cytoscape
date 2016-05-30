@@ -1,6 +1,6 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace DocumentFormat.Visualization.visualProperty
+Namespace Visualization.visualProperty
 
     Public Class visualProperty
         <XmlAttribute("name")> Public Property name As String

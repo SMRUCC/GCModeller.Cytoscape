@@ -1,9 +1,8 @@
 ﻿Imports System.Xml.Serialization
-Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.DocumentFormat.CytoscapeGraphView.DocumentElements
 
-Namespace DocumentFormat.CytoscapeGraphView
+Namespace CytoscapeGraphView.XGMML
 
-    Public Class Graphics : Inherits DocumentElements.AttributeDictionary
+    Public Class Graphics : Inherits AttributeDictionary
 
         Public ReadOnly Property ScaleFactor As Double
             Get

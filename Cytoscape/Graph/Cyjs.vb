@@ -3,8 +3,9 @@ Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.DataVisualization.Network.LDM.Abstract
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports System.Web.Script.Serialization
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 
-Namespace DocumentFormat.CytoscapeGraphView.Cyjs
+Namespace CytoscapeGraphView.Cyjs
 
     ''' <summary>
     ''' 网络模型的JSON文档格式

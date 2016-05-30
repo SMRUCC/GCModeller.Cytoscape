@@ -1,6 +1,6 @@
 ﻿Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.Reflection
 
-Namespace DocumentFormat.Tables
+Namespace Tables
 
     Public Class Edge
         Public Property SUID As Integer

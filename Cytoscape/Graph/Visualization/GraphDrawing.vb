@@ -1,9 +1,10 @@
 ﻿Imports System.Drawing
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 Imports LANS.SystemsBiology.Assembly.KEGG.DBGET.ReferenceMap
 Imports LANS.SystemsBiology.GCModeller.DataVisualization
 Imports Microsoft.VisualBasic.Imaging
 
-Namespace DocumentFormat.CytoscapeGraphView
+Namespace CytoscapeGraphView
 
     Public Module GraphDrawing
 
@@ -131,7 +132,7 @@ Namespace DocumentFormat.CytoscapeGraphView
             Call Size.__DEBUG_ECHO
 
             Dim Nodes = Graph.Nodes.ToDictionary(Function(n) n.id)
-            Dim Colors = ColorProfiles.GenerateColorProfiles(map)
+            Dim Colors = GenerateColorProfiles(map)
 
             For Each Edge In Graph.Edges
                 Dim pt1 = Nodes(Edge.source), pt2 = Nodes(Edge.target)
@@ -152,7 +153,7 @@ Namespace DocumentFormat.CytoscapeGraphView
                     Dim B = (From cl In ColorList Select clB = CDbl(cl.sp_Color.B)).ToArray.Average
                     Color = Drawing.Color.FromArgb(alpha, R, G, B)
 
-                    Call Gr.Graphics.DrawString(String.Join("; ", (From cl In ColorList Select cl.sp).ToArray), New Font("Ubuntu", 6), Brushes.Red, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale - Node.Graphics.h * 0.2))
+                    Call Gr.Graphics.DrawString(String.Join("; ", (From cl In ColorList Select cl.sp).ToArray), New Font(FontFace.Ubuntu, 6), Brushes.Red, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale - Node.Graphics.h * 0.2))
                 Else
                     Color = System.Drawing.Color.FromArgb(alpha, Drawing.Color.Blue)
                 End If
@@ -175,7 +176,7 @@ Namespace DocumentFormat.CytoscapeGraphView
             Return Gr.ImageResource
         End Function
 
-        Private Function __calculation(Node As DocumentElements.Node, ByRef IsPie As Boolean, OffSet As Point, Scale As Integer) As Rectangle
+        Private Function __calculation(Node As XGMML.Node, ByRef IsPie As Boolean, OffSet As Point, Scale As Integer) As Rectangle
             Dim rt As Double = Math.Abs(Node.Graphics.w - Node.Graphics.h) / Math.Min(Node.Graphics.w, Node.Graphics.h)
             Dim DEntry = Node("Degree")
             Dim Degree As Integer = If(DEntry Is Nothing, 1, CInt(Val(DEntry.Value)))

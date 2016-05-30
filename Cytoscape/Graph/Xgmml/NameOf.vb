@@ -1,4 +1,4 @@
-﻿Namespace DocumentFormat.CytoscapeGraphView
+﻿Namespace CytoscapeGraphView.XGMML
 
     Public Module [NameOf]
 

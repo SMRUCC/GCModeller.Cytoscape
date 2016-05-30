@@ -88,6 +88,37 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>Cytoscape.NET.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>Cytoscape.NET.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Publish|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Publish\</OutputPath>
+    <DocumentationFile>Cytoscape.NET.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -116,31 +147,31 @@
   <ItemGroup>
     <Compile Include="API\ImportantNodes\LDM.vb" />
     <Compile Include="API\ImportantNodes\ImportantNodes.vb" />
-    <Compile Include="DocumentFormat\CsvTables\EdgeTable.vb" />
-    <Compile Include="DocumentFormat\CsvTables\NodeTable.vb" />
-    <Compile Include="DocumentFormat\Graph\Cyjs.vb" />
-    <Compile Include="DocumentFormat\Graph\Visualization\CytoscapeColor.vb" />
-    <Compile Include="DocumentFormat\Graph\Visualization\Node.vb" />
-    <Compile Include="DocumentFormat\Graph\Serialization\GraphicsMapper.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\Attributes.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\NodeGraphics.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\NameOf.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\GraphExtensions.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\RDFXml.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\Graphics.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\EdgeGraphics.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\Edge.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\Node.vb" />
-    <Compile Include="DocumentFormat\Graph\Visualization\GraphDrawing.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\NetworkMetadata.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\visualStyle\visualProperty.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\visualStyle\network.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\visualStyle\node.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\visualStyle\edge.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\visualStyle\visualStyle.vb" />
-    <Compile Include="DocumentFormat\Graph\VizMap\VizMap.vb" />
-    <Compile Include="DocumentFormat\Graph\Serialization\ExportToFile.vb" />
-    <Compile Include="DocumentFormat\Graph\Xgmml\Graph.vb" />
+    <Compile Include="Tabular\EdgeTable.vb" />
+    <Compile Include="Tabular\NodeTable.vb" />
+    <Compile Include="Graph\Cyjs.vb" />
+    <Compile Include="Graph\Visualization\CytoscapeColor.vb" />
+    <Compile Include="Graph\Visualization\Node.vb" />
+    <Compile Include="Graph\Serialization\GraphicsMapper.vb" />
+    <Compile Include="Graph\Xgmml\Attributes.vb" />
+    <Compile Include="Graph\Xgmml\NodeGraphics.vb" />
+    <Compile Include="Graph\Xgmml\NameOf.vb" />
+    <Compile Include="Graph\Xgmml\GraphExtensions.vb" />
+    <Compile Include="Graph\Xgmml\RDFXml.vb" />
+    <Compile Include="Graph\Xgmml\Graphics.vb" />
+    <Compile Include="Graph\Xgmml\EdgeGraphics.vb" />
+    <Compile Include="Graph\Xgmml\Edge.vb" />
+    <Compile Include="Graph\Xgmml\Node.vb" />
+    <Compile Include="Graph\Visualization\GraphDrawing.vb" />
+    <Compile Include="Graph\Xgmml\NetworkMetadata.vb" />
+    <Compile Include="Graph\VizMap\visualStyle\visualProperty.vb" />
+    <Compile Include="Graph\VizMap\visualStyle\network.vb" />
+    <Compile Include="Graph\VizMap\visualStyle\node.vb" />
+    <Compile Include="Graph\VizMap\visualStyle\edge.vb" />
+    <Compile Include="Graph\VizMap\visualStyle\visualStyle.vb" />
+    <Compile Include="Graph\VizMap\VizMap.vb" />
+    <Compile Include="Graph\Serialization\ExportToFile.vb" />
+    <Compile Include="Graph\Xgmml\Graph.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -167,7 +198,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cytoscape.Designer.cd" />
-    <None Include="DocumentFormat\Graph\Visualization\Visualization.pptx" />
+    <None Include="Graph\Visualization\Visualization.pptx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

@@ -5,7 +5,7 @@ Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.Language
 
-Namespace DocumentFormat.CytoscapeGraphView
+Namespace CytoscapeGraphView.XGMML
 
     ''' <summary>
     ''' The Cytoscape software XML format network visualization model.(Cytoscape软件的网络XML模型文件)
@@ -35,7 +35,7 @@ Namespace DocumentFormat.CytoscapeGraphView
         <XmlAttribute("directed")> Public Property Directed As String
         <XmlAttribute("cy-documentVersion")> Public Property documentVersion As String
         <XmlIgnore>
-        Public Property NetworkMetaData As DocumentElements.NetworkMetadata
+        Public Property NetworkMetaData As NetworkMetadata
             Get
                 If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
                     Return _attrs(ATTR_NAME_NETWORK_METADATA).RDF.meta
@@ -43,17 +43,17 @@ Namespace DocumentFormat.CytoscapeGraphView
                     Return Nothing
                 End If
             End Get
-            Set(value As DocumentElements.NetworkMetadata)
+            Set(value As NetworkMetadata)
                 If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
                     _attrs(ATTR_NAME_NETWORK_METADATA).RDF =
-                        New DocumentElements.InnerRDF With {
+                        New InnerRDF With {
                             .meta = value
                     }
                 Else
                     _attrs(ATTR_NAME_NETWORK_METADATA) =
                         New GraphAttribute With {
                             .Name = ATTR_NAME_NETWORK_METADATA,
-                            .RDF = New DocumentElements.InnerRDF With {
+                            .RDF = New InnerRDF With {
                                 .meta = value
                         }
                     }
@@ -78,26 +78,26 @@ Namespace DocumentFormat.CytoscapeGraphView
             End Set
         End Property
         <XmlElement("graphics")> Public Property Graphics As Graphics
-        <XmlElement("node")> Public Property Nodes As DocumentElements.Node()
+        <XmlElement("node")> Public Property Nodes As XGMML.Node()
             Get
                 If _nodeList.IsNullOrEmpty Then
-                    Return New DocumentElements.Node() {}
+                    Return New XGMML.Node() {}
                 End If
                 Return _nodeList.Values.ToArray
             End Get
-            Set(value As DocumentElements.Node())
+            Set(value As XGMML.Node())
                 If value.IsNullOrEmpty Then
-                    _nodeList = New Dictionary(Of String, DocumentElements.Node)
+                    _nodeList = New Dictionary(Of String, XGMML.Node)
                 Else
                     _nodeList = value.ToDictionary(Function(obj) obj.label)
                 End If
             End Set
         End Property
 
-        <XmlElement("edge")> Public Property Edges As DocumentElements.Edge()
+        <XmlElement("edge")> Public Property Edges As XGMML.Edge()
 
         Dim _attrs As Dictionary(Of GraphAttribute)
-        Dim _nodeList As Dictionary(Of String, DocumentElements.Node)
+        Dim _nodeList As Dictionary(Of String, XGMML.Node)
 #End Region
 
         ''' <summary>
@@ -105,15 +105,15 @@ Namespace DocumentFormat.CytoscapeGraphView
         ''' </summary>
         ''' <param name="Label">Synonym</param>
         ''' <returns></returns>
-        Public Function GetNode(Label As String) As DocumentElements.Node
-            Dim Node As DocumentElements.Node = Nothing
+        Public Function GetNode(Label As String) As XGMML.Node
+            Dim Node As XGMML.Node = Nothing
             Call _nodeList.TryGetValue(Label, Node)
             Return Node
         End Function
 
-        Public Function GetNode(ID As Long) As DocumentElements.Node
-            Return LinqAPI.DefaultFirst(Of DocumentElements.Node) <=
-                From node As DocumentElements.Node
+        Public Function GetNode(ID As Long) As XGMML.Node
+            Return LinqAPI.DefaultFirst(Of XGMML.Node) <=
+                From node As XGMML.Node
                 In Me._nodeList.Values
                 Where node.id = ID
                 Select node
@@ -162,12 +162,12 @@ Namespace DocumentFormat.CytoscapeGraphView
                 .Label = "",
                 .ID = "",
                 .Directed = "1",
-                .NetworkMetaData = New DocumentElements.NetworkMetadata
+                .NetworkMetaData = New NetworkMetadata
             }
             Return Graph
         End Function
 
-        Public Function ExistEdge(Edge As DocumentElements.Edge) As Boolean
+        Public Function ExistEdge(Edge As XGMML.Edge) As Boolean
             Return Not (GetNode(Edge.source) Is Nothing OrElse GetNode(Edge.target) Is Nothing)
         End Function
 

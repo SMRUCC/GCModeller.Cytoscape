@@ -1,6 +1,6 @@
 ﻿Imports System.Xml.Serialization
 
-Namespace DocumentFormat.Visualization.DocumentNodes
+Namespace Visualization
 
     Public Class visualStyle
 

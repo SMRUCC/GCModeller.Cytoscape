@@ -3,7 +3,7 @@ Imports Microsoft.VisualBasic.DocumentFormat.Csv.Extensions
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
 Imports Microsoft.VisualBasic
 
-Namespace DocumentFormat.Tables
+Namespace Tables
 
     Public Class Node : Implements sIdEnumerable
 

@@ -1,4 +1,4 @@
-﻿Namespace DocumentFormat.Visualization.DocumentNodes
+﻿Namespace Visualization
 
     Public Class node : Inherits visualNode
     End Class

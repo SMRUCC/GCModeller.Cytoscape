@@ -2,7 +2,7 @@
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.Imaging
 
-Namespace DocumentFormat.CytoscapeGraphView.DocumentElements
+Namespace CytoscapeGraphView.XGMML
 
     Public Class NodeGraphics : Inherits AttributeDictionary
         <XmlAttribute("outline")> Public Property Outline As String
