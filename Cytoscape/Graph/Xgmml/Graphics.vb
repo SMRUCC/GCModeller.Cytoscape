@@ -17,8 +17,16 @@ Namespace CytoscapeGraphView.XGMML
 
         Public Shared Function DefaultValue() As Graphics
             Dim attrs As Attribute() = {
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_HEIGHT, "892.0"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_CENTER_Z_LOCATION, "0.0"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_EDGE_SELECTION, "true"),
                 Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_BACKGROUND_PAINT, "#EBE8E1"),
-                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_NETWORK_DEPTH, "0.0")
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_NETWORK_WIDTH, "1554.0"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_CENTER_Y_LOCATION, "104.00000095367432"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_NODE_SELECTION, "true"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_SCALE_FACTOR, "3.4140904692008895"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_NETWORK_DEPTH, "0.0"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_TITLE, "")
             }
 
             Return New Graphics With {
