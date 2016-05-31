@@ -196,7 +196,8 @@ Namespace CytoscapeGraphView.XGMML
         End Function
 
         ''' <summary>
-        ''' Save this cytoscape network visualization model using this function.(请使用这个方法进行Cytoscape网络模型文件的保存)
+        ''' Save this cytoscape network visualization model using this function.
+        ''' (请使用这个方法进行Cytoscape网络模型文件的保存)
         ''' </summary>
         ''' <param name="FilePath">The file path of the xml file saved location.</param>
         ''' <param name="encoding">The text encoding of saved text file.</param>

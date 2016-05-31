@@ -1,4 +1,6 @@
 ﻿Imports System.Runtime.CompilerServices
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.Serialization
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.NetworkModel.PfsNET
 Imports LANS.SystemsBiology.AnalysisTools.NBCR.Extensions.MEME_Suite.Analysis.GenomeMotifFootPrints
 Imports LANS.SystemsBiology.AnalysisTools.NBCR.Extensions.MEME_Suite.DocumentFormat
@@ -99,7 +101,8 @@ Partial Module CLI
     ''' </summary>
     ''' <param name="args"></param>
     ''' <returns></returns>
-    <ExportAPI("/modNET.Simple", Usage:="/modNET.Simple /in <mods/pathway_DIR> [/out <outDIR> /pathway]")>
+    <ExportAPI("/modNET.Simple",
+               Usage:="/modNET.Simple /in <mods/pathway_DIR> [/out <outDIR> /pathway]")>
     Public Function SimpleModesNET(args As CommandLine.CommandLine) As Integer
         Dim inDIR As String = args("/in")
         Dim outDIR As String = args.GetValue("/out", inDIR & "-SimpleModsNET/")
@@ -142,6 +145,9 @@ Partial Module CLI
                 End If
             Next
         Next
+
+        Dim graph As Graph = ExportToFile.Export(net.Nodes, net.Edges, "KEGG pathway network simple")
+        Call graph.Save(outDIR & "/Graph.XGMML", )
 
         Return net > outDIR   ' Write the network data to the filesystem.
     End Function

@@ -6,12 +6,16 @@ Imports Microsoft.VisualBasic.DataVisualization.Network
 Imports Microsoft.VisualBasic.DocumentFormat.Csv.Extensions
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports Microsoft.VisualBasic
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.Serialization
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
+Imports Microsoft.VisualBasic.Language
 
 Partial Module CLI
 
-    <ExportAPI("--TCS", Usage:="--TCS /in <TCS.csv.DIR> /regulations <TCS.virtualfootprints> /out <outForCytoscape.xml> [/Fill-pcc]")>
+    <ExportAPI("--TCS",
+               Usage:="--TCS /in <TCS.csv.DIR> /regulations <TCS.virtualfootprints> /out <outForCytoscape.xml> [/Fill-pcc]")>
     <ParameterInfo("/Fill-pcc", True,
-                          Description:="If the predicted regulation data did'nt contains pcc correlation value, then you can using this parameter to fill default value 0.6 or just left it default as ZERO")>
+                   Description:="If the predicted regulation data did'nt contains pcc correlation value, then you can using this parameter to fill default value 0.6 or just left it default as ZERO")>
     Public Function TCS(args As CommandLine.CommandLine) As Integer
         Dim TCSDir As String = args("/in")
         Dim regulations As String = args("/regulations")
@@ -23,12 +27,13 @@ Partial Module CLI
 
         Dim HK As String() = (From name As String In TCSProfiles.ToArray(Function(cTk) cTk.Kinase) Select name Distinct Order By name Ascending).ToArray
         Dim RR As String() = (From name As String In TCSProfiles.ToArray(Function(cTK) cTK.Regulator) Select name Distinct Order By name).ToArray
-        Dim Regulators As String() = (From name As String
-                                      In virtualFootprints.ToArray(Function(regulate) regulate.Regulator)
-                                      Where Not String.IsNullOrEmpty(name)
-                                      Select name
-                                      Distinct
-                                      Order By name Ascending).ToArray
+        Dim Regulators As String() =
+            LinqAPI.Exec(Of String) <= From name As String
+                                       In virtualFootprints.Select(Function(regulate) regulate.Regulator)
+                                       Where Not String.IsNullOrEmpty(name)
+                                       Select name
+                                       Distinct
+                                       Order By name Ascending
         Dim Hybirds As String() = StringHelpers.Intersection(HK, RR)
         Dim Nodes As New List(Of Entity)
         Call Nodes.Add((From name As String In HK Where Array.IndexOf(Hybirds, name) = -1 Select New Entity With {.Identifier = name, .NodeType = "HK"}).ToArray)
@@ -61,9 +66,8 @@ Partial Module CLI
                                     .ToNode = regulation.ORF,
                                     .InteractionType = "Regulates",
                                     .Family = regulation.MotifId}).ToArray)
-        Dim doc = CytoscapeGraphView.Serialization.ExportToFile.Export(Nodes.ToArray, Edges.ToArray, "TCS Crosstalks and Regulations")
-        Call doc.Save(out)
-        Return 0
+        Dim doc As Graph = ExportToFile.Export(Nodes.ToArray, Edges.ToArray, "TCS Crosstalks and Regulations")
+        Return doc.Save(out)
     End Function
 
     Public Class Entity : Inherits FileStream.Node

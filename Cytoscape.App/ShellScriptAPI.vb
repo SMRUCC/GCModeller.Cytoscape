@@ -2,11 +2,12 @@
 Imports LANS.SystemsBiology.DatabaseServices
 Imports LANS.SystemsBiology.AnalysisTools.NBCR.Extensions.MEME_Suite
 Imports System.Drawing
-Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.DocumentFormat.CytoscapeGraphView
 Imports Microsoft.VisualBasic.Scripting.MetaData
 Imports LANS.SystemsBiology.Assembly.MetaCyc.File.FileSystem
 Imports LANS.SystemsBiology.Assembly.KEGG.DBGET.ReferenceMap
 Imports Microsoft.VisualBasic.Linq
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView
 
 <[PackageNamespace]("Cytoscape",
                     Cites:="Shannon, P., et al. (2003). ""Cytoscape: a software environment For integrated models Of biomolecular interaction networks."" Genome Res 13(11): 2498-2504.
@@ -103,34 +104,34 @@ Public Module ShellScriptAPI
         Graph.ID = RefMap.EntryId
         Graph.Label = RefMap.Name
         Graph.Nodes = (From rxn In Reaction
-                       Let InternalAttr = New DocumentElements.Attribute() {
-                           New DocumentElements.Attribute With {
+                       Let InternalAttr = New XGMML.Attribute() {
+                           New XGMML.Attribute With {
                                 .Name = "KEGG_ENTRY",
                                 .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Entry
                            },
-                           New DocumentElements.Attribute With {
+                           New XGMML.Attribute With {
                                 .Name = "Equation",
                                 .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Equation
                            },
-                           New DocumentElements.Attribute With {
+                           New XGMML.Attribute With {
                                 .Name = "EC",
                                 .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.EcNum
                            },
-                           New DocumentElements.Attribute With {
+                           New XGMML.Attribute With {
                                 .Name = "def",
                                 .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Definition
                            },
-                           New DocumentElements.Attribute With {
+                           New XGMML.Attribute With {
                                 .Name = "comments",
                                 .Type = ATTR_VALUE_TYPE_STRING,
                                 .Value = rxn.refRxnX.Comments
                            }
                        }
-                       Select New DocumentElements.Node With {
+                       Select New XGMML.Node With {
                            .label = rxn.ID,
                            .Attributes = InternalAttr
                            }).ToArray.AddHandle
@@ -141,7 +142,7 @@ Public Module ShellScriptAPI
                                                                 Where target.DataModel.GetCoEfficient(source.Identifier) < 0
                                                                 Select source.Identifier).ToArray
                                     Where Not Compound.IsNullOrEmpty
-                                    Select New DocumentElements.Edge With {
+                                    Select New XGMML.Edge With {
                                         .source = Graph.GetNode(rxn.ID).id,
                                         .target = Graph.GetNode(target.ID).id,
                                         .Label = Compound.First}).ToArray
