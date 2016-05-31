@@ -16,6 +16,8 @@ Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscap
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.NetworkModel.KEGG
 Imports LANS.SystemsBiology.Assembly.KEGG.Archives.Xml.Nodes
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.DocumentFormat
+Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream
+Imports Microsoft.VisualBasic.Language
 
 Partial Module CLI
 
@@ -238,7 +240,11 @@ Partial Module CLI
         End If
 
         If cut <> 0R Then  ' 按照阈值筛选
-            net.Edges = (From x In net.Edges Where Math.Abs(x.Confidence) >= cut Select x).ToArray
+            net.Edges =
+                LinqAPI.Exec(Of NetworkEdge) <= From x As NetworkEdge
+                                                In net.Edges
+                                                Where Math.Abs(x.Confidence) >= cut
+                                                Select x
             out = out & "." & cut
         End If
 
