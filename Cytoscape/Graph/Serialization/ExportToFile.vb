@@ -36,7 +36,8 @@ Namespace CytoscapeGraphView.Serialization
             Dim Model As Graph = New Graph With {
                     .Label = "0",
                     .ID = "1",
-                    .Directed = "1"
+                    .Directed = "1",
+                    .Graphics = Graphics.DefaultValue
             }
             Dim ModelAttributes = New GraphAttribute() {
                 New GraphAttribute With {
@@ -97,7 +98,8 @@ Namespace CytoscapeGraphView.Serialization
             Dim Model As New Graph With {
                 .Label = "0",
                 .ID = "1",
-                .Directed = "1"
+                .Directed = "1",
+                .Graphics = Graphics.DefaultValue
             }
             Dim ModelAttributes = New XGMML.Attribute() {
                 New XGMML.Attribute With {
@@ -116,9 +118,13 @@ Namespace CytoscapeGraphView.Serialization
             Dim hash As Dictionary(Of String, XGMML.Node) =
                 Model.Nodes.ToDictionary(Function(x) x.label)
 
+            VBDebugger.Mute = True
+
             Model.Nodes = __exportNodes(NodeList, NodeTypeMapping)
             Model.Edges = __exportEdges(Edges, hash, EdgeTypeMapping, interMaps)
             Model.Attributes = ModelAttributes
+
+            VBDebugger.Mute = False
 
             Return Model
         End Function
@@ -199,15 +205,15 @@ Namespace CytoscapeGraphView.Serialization
                 nodes.ExportAsPropertyAttributes(False)
             Dim typeMapping As Func(Of String, String) =
                 __createTypeMapping(nodeTypeMapping)
-            Dim LQuery = (From x As Dictionary(Of String, String)
-                          In buf.AsParallel
-                          Let node_obj = __exportNode(x, __getType:=typeMapping)
-                          Select node_obj
-                          Group node_obj By node_obj.label Into Group
-                          Order By label Ascending).ToArray ' Linq查询在这里会被执行两次，不清楚是什么原因
+            Dim LQuery = From x As Dictionary(Of String, String)
+                         In buf.AsParallel
+                         Let node_obj = __exportNode(x, __getType:=typeMapping)
+                         Select node_obj
+                         Group node_obj By node_obj.label Into Group
+                         Order By label Ascending ' Linq查询在这里会被执行两次，不清楚是什么原因
             Return LQuery.Select(Function(x) x.Group) _
                 .ToArray(AddressOf DefaultFirst) _
-                .AddHandle.ToArray  '生成节点数据并去除重复
+                .AddHandle  ' 生成节点数据并去除重复
         End Function
 
         Private Function __exportNode(dict As Dictionary(Of String, String), __getType As Func(Of String, String)) As XGMML.Node

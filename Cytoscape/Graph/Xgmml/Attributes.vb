@@ -18,8 +18,8 @@ Namespace CytoscapeGraphView.XGMML
         <XmlAttribute("value")> Public Property Value As String
         <XmlAttribute("type")> Public Property Type As String
 
-        <XmlAttribute("cy_hidden")> Public Property Hidden As String
-        <XmlAttribute("cy_directed")> Public Property Directed As String
+        <XmlAttribute("cy-hidden")> Public Property Hidden As String
+        <XmlAttribute("cy-directed")> Public Property Directed As String
         <XmlAttribute("cy-type")> Public Property cyType As String
         <XmlAttribute("cy-elementType")> Public Property elementType As String
 
@@ -38,6 +38,15 @@ Namespace CytoscapeGraphView.XGMML
 
         Public Overrides Function ToString() As String
             Return $"({Type}) {Name} = {Value}"
+        End Function
+
+        Public Shared Function StringValue(name As String, value As String) As Attribute
+            Return New Attribute With {
+                .Name = name,
+                .Value = value,
+                .cyType = NameOf(System.String),
+                .Type = ATTR_VALUE_TYPE_STRING
+            }
         End Function
     End Class
 

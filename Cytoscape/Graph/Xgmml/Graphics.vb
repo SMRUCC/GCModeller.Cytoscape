@@ -14,6 +14,17 @@ Namespace CytoscapeGraphView.XGMML
                 End If
             End Get
         End Property
+
+        Public Shared Function DefaultValue() As Graphics
+            Dim attrs As Attribute() = {
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_BACKGROUND_PAINT, "#EBE8E1"),
+                Attribute.StringValue([NameOf].ATTR_NETWORK_GRAPHICS_NETWORK_DEPTH, "0.0")
+            }
+
+            Return New Graphics With {
+                .Attributes = attrs
+            }
+        End Function
     End Class
 
     Public Class GraphAttribute : Inherits Attribute
