@@ -38,13 +38,13 @@ Namespace CytoscapeGraphView.Serialization
                     .ID = "1",
                     .Directed = "1"
             }
-            Dim ModelAttributes = New XGMML.Attribute() {
-                New XGMML.Attribute With {
+            Dim ModelAttributes = New GraphAttribute() {
+                New GraphAttribute With {
                     .Name = ATTR_SHARED_NAME,
                     .Value = Title,
                     .Type = ATTR_VALUE_TYPE_STRING
                 },
-                New XGMML.Attribute With {
+                New GraphAttribute With {
                     .Name = ATTR_NAME,
                     .Value = Title,
                     .Type = ATTR_VALUE_TYPE_STRING
@@ -52,6 +52,8 @@ Namespace CytoscapeGraphView.Serialization
             }
             Dim EdgeSchema = SchemaProvider.CreateObject(GetType(Edge), False)
             Dim interMaps = __mapInterface(EdgeSchema)
+
+            VBDebugger.Mute = False
 
             Model.Nodes = __exportNodes(NodeList, GetType(Node).GetDataFrameworkTypeSchema(False))
             Model.Edges = __exportEdges(Of Edge)(Edges,
@@ -63,6 +65,8 @@ Namespace CytoscapeGraphView.Serialization
                 .Title = "GCModeller Exports: " & Title,
                 .Description = "http://code.google.com/p/genome-in-code/cytoscape"
             }
+
+            VBDebugger.Mute = True
 
             Return Model
         End Function
@@ -195,12 +199,12 @@ Namespace CytoscapeGraphView.Serialization
                 nodes.ExportAsPropertyAttributes(False)
             Dim typeMapping As Func(Of String, String) =
                 __createTypeMapping(nodeTypeMapping)
-            Dim LQuery = From x As Dictionary(Of String, String)
-                         In buf.AsParallel
-                         Let node_obj = __exportNode(x, __getType:=typeMapping)
-                         Select node_obj
-                         Group node_obj By node_obj.label Into Group
-                         Order By label Ascending
+            Dim LQuery = (From x As Dictionary(Of String, String)
+                          In buf.AsParallel
+                          Let node_obj = __exportNode(x, __getType:=typeMapping)
+                          Select node_obj
+                          Group node_obj By node_obj.label Into Group
+                          Order By label Ascending).ToArray ' Linq查询在这里会被执行两次，不清楚是什么原因
             Return LQuery.Select(Function(x) x.Group) _
                 .ToArray(AddressOf DefaultFirst) _
                 .AddHandle.ToArray  '生成节点数据并去除重复
