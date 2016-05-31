@@ -242,7 +242,8 @@ Namespace CytoscapeGraphView.Serialization
 
             Dim node As New XGMML.Node With {
                 .label = ID,
-                .Attributes = attrs.ToArray
+                .Attributes = attrs.ToArray,
+                .Graphics = New NodeGraphics
             }
 
             Return node
@@ -343,7 +344,8 @@ Namespace CytoscapeGraphView.Serialization
                     .Label = label,
                     .source = fromNode.id,
                     .target = toNode.id,
-                    .Attributes = attrs
+                    .Attributes = attrs,
+                    .Graphics = New EdgeGraphics
             }
             Return Node
         End Function

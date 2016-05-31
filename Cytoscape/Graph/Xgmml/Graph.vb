@@ -33,7 +33,12 @@ Namespace CytoscapeGraphView.XGMML
         ''' <returns></returns>
         ''' <remarks></remarks>
         <XmlAttribute("directed")> Public Property Directed As String
-        <XmlAttribute("cy-documentVersion")> Public Property documentVersion As String
+        <XmlAttribute("cy-documentVersion")> Public Property documentVersion As String = "3.0"
+
+        ''' <summary>
+        ''' 在这个属性里面会自动设置Graph对象的属性列表里面的数据
+        ''' </summary>
+        ''' <returns></returns>
         <XmlIgnore>
         Public Property NetworkMetaData As NetworkMetadata
             Get

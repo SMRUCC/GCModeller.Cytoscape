@@ -6,6 +6,7 @@ Imports Microsoft.VisualBasic.Serialization
 Namespace CytoscapeGraphView.XGMML
 
     Public Class InnerRDF
+
         <XmlElement("rdf-Description")> Public Property meta As NetworkMetadata
 
         Public Overrides Function ToString() As String

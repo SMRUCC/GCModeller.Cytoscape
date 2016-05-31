@@ -25,6 +25,17 @@ Namespace CytoscapeGraphView.XGMML
         Const rdf As String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         Const cy As String = "http://www.cytoscape.org"
 
+        Public Function WriteXml(graph As Graph, encoding As Encoding, path As String) As Boolean
+            If graph.NetworkMetaData Is Nothing Then
+                graph.NetworkMetaData = New NetworkMetadata With {
+                    .about = "http://www.cytoscape.org/"
+                }
+            Else
+                graph.NetworkMetaData.about = "http://www.cytoscape.org/"
+            End If
+            Return WriteXml(graph.GetXml, encoding, path)
+        End Function
+
         Public Function WriteXml(xml As String, encoding As Encoding, path As String) As Boolean
             Dim doc As New XmlDoc(xml)
 
