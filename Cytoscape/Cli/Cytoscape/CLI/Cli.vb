@@ -7,9 +7,11 @@ Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.Scripting.MetaData
 Imports Microsoft.VisualBasic.Serialization
 
-<PackageNamespace("Cytoscape.CLI", Category:=APICategories.CLI_MAN,
-                  Description:="This is a lite version of the cytoscape program from cytoscape.org in GCModeller",
-                  Publisher:="xie.guigang@gcmodeller.org")>
+<PackageNamespace("Cytoscape.CLI",
+                  Category:=APICategories.CLI_MAN,
+                  Description:="Cytoscape model generator and visualization tools utils for GCModeller",
+                  Publisher:="xie.guigang@gcmodeller.org",
+                  Url:="https://github.com/xieguigang/GCModeller.Cytoscape")>
 Module CLI
 
     <ExportAPI("-Draw",

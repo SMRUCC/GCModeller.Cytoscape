@@ -2,17 +2,21 @@
 Imports Microsoft.VisualBasic
 Imports LANS.SystemsBiology.DatabaseServices
 Imports LANS.SystemsBiology.AnalysisTools.NBCR.Extensions.MEME_Suite
+Imports Microsoft.VisualBasic.DataVisualization.Network
+Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream
+Imports Microsoft.VisualBasic.Language
+Imports LANS.SystemsBiology.Assembly.MetaCyc.File.FileSystem
 
 Namespace NetworkModel
 
     Public Class PathwayRegulation : Inherits Pathways
 
-        Sub New(MetaCyc As LANS.SystemsBiology.Assembly.MetaCyc.File.FileSystem.DatabaseLoadder)
+        Sub New(MetaCyc As DatabaseLoadder)
             Call MyBase.New(MetaCyc)
         End Sub
 
         Public Sub AnalysisMetaPathwayRegulations(ExportDir As String, RegulationProfiles As MatchedResult())
-            Dim Edges As Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge() = Nothing, Nodes As Pathways.Pathway() = Nothing
+            Dim Edges As NetworkEdge() = Nothing, Nodes As Pathways.Pathway() = Nothing
             Call Export(Edges, Nodes)
 
             Call Console.WriteLine("Generate TF <--> pathway regulations...")
@@ -69,7 +73,7 @@ Namespace NetworkModel
             Next
 
             Call Network.AddRange(Edges)
-            Dim ChunkList As List(Of Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge) = New List(Of Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge)
+            Dim ChunkList As New List(Of NetworkEdge)
 
             Call Console.WriteLine("Remove the duplicated data!")
 
@@ -98,14 +102,16 @@ Namespace NetworkModel
             Return False
         End Function
 
-        Private Shared Function Exists(Network As Generic.IEnumerable(Of Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge),
-                                       Node As Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge) As Boolean
-            Dim LQuery = (From NodeItem In Network.AsParallel Where NodeItem.IsEqual(Node) Select 1).ToArray
-            Return Not LQuery.IsNullOrEmpty
+        Private Shared Function Exists(Network As IEnumerable(Of NetworkEdge), Node As NetworkEdge) As Boolean
+            Dim LQuery As Integer =
+                LinqAPI.DefaultFirst(Of Integer) <= From edge As NetworkEdge
+                                                    In Network.AsParallel
+                                                    Where edge.IsEqual(Node)
+                                                    Select 100
+            Return LQuery > 50
         End Function
 
-        Public Class PathwayRegulator : Inherits Microsoft.VisualBasic.DataVisualization.Network.FileStream.Node
-
+        Public Class PathwayRegulator : Inherits FileStream.Node
         End Class
     End Class
 End Namespace

@@ -7,6 +7,7 @@ Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
 Imports Microsoft.VisualBasic.DocumentFormat.Csv
 Imports Microsoft.VisualBasic
+Imports Microsoft.VisualBasic.Language
 
 ''' <summary>
 ''' 整理出代谢途径和相应的基因，对于基因个数少于5的代谢途径，其被合并至其他较大的SuperPathway之中去
@@ -32,30 +33,40 @@ Public Class MetaCycPathways
     ''' </remarks>
     Public Function Performance() As Pathway()
         Dim pwys As Pathways = MetaCyc.GetPathways
-        Dim rxnGeneLinks As Dictionary(Of String, String()) = New AssignGene(MetaCyc).Performance
-        Dim pathways = (From pwy In pwys Select __generatePwy(pwy, rxnGeneLinks)).ToArray
+        Dim rxnGeneLinks As Dictionary(Of String, String()) =
+            New AssignGene(MetaCyc).Performance
+        Dim pathways As Pathway() = (From pwy As Slots.Pathway
+                                     In pwys
+                                     Select __generatePwy(pwy, rxnGeneLinks)).ToArray
+
         For i As Integer = 0 To pathways.Length - 1
             Dim pway = pathways(i)
             If pway.SuperPathway Then
-                pway.ContiansSubPathway = (From pwy In pathways Where pway.MetaCycBaseType.SubPathways.IndexOf(pwy.Identifier) > -1 Select pwy).ToArray
+                pway.ContiansSubPathway =
+                    LinqAPI.Exec(Of Pathway) <= From pwy As Pathway
+                                                In pathways
+                                                Where pway.MetaCycBaseType.SubPathways.IndexOf(pwy.Identifier) > -1
+                                                Select pwy
             End If
         Next
         Return pathways
     End Function
 
     Private Function __generatePwy(pwyObj As Slots.Pathway, RxnGeneLinks As Dictionary(Of String, String())) As Pathway
-        Dim pathway As Pathway = New Pathway With {
+        Dim pathway As New Pathway With {
             .Identifier = pwyObj.Identifier,
             .SuperPathway = pwyObj.Types.IndexOf("Super-Pathways") > -1,
             .MetaCycBaseType = pwyObj
-        } '实例化一个返回对象
-        pathway.ReactionList = (From rxnId As String
-                                In pwyObj.ReactionList
-                                Where RxnGeneLinks.ContainsKey(rxnId)
-                                Select New Key_strArrayValuePair With {
-                                    .Key = rxnId,
-                                    .Value = RxnGeneLinks(rxnId)
-                                }).ToArray     '获取反应对象列表
+        } ' 实例化一个返回对象
+        pathway.ReactionList =
+            LinqAPI.Exec(Of Key_strArrayValuePair) <=
+                From rxnId As String
+                In pwyObj.ReactionList
+                Where RxnGeneLinks.ContainsKey(rxnId)
+                Select New Key_strArrayValuePair With {
+                    .Key = rxnId,
+                    .Value = RxnGeneLinks(rxnId)
+                }     '获取反应对象列表
         Return pathway
     End Function
 
@@ -126,14 +137,14 @@ Public Class MetaCycPathways
         Dim List As List(Of String) = New List(Of String)
 
         For Each pwy In Pathways
-            Dim GeneCollection = (From gene In Genes.Takes(pwy.AssociatedGenes) Select gene.Accession1).ToArray  '
-            Call List.AddRange(GeneCollection)
+            List += From gene As Slots.Gene
+                    In Genes.Takes(pwy.AssociatedGenes)
+                    Select gene.Accession1
         Next
-        List = List.Distinct.ToList
 
         Dim File As New DocumentStream.File
         Call File.AppendLine(New String() {"AccessionId", "Common_name", "Description", "Pfam_domains", "Sequence"})
-        For Each Id As String In List
+        For Each Id As String In List.Distinct
             Call File.AppendLine(ProteinDomains.FindAtColumn(KeyWord:=Id, Column:=0).First)
         Next
         Return File
