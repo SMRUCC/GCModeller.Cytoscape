@@ -9,6 +9,7 @@ Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic
 Imports LANS.SystemsBiology.ComponentModel.Loci
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView
+Imports Microsoft.VisualBasic.Language
 
 Namespace NetworkModel.StringDB
 
@@ -34,7 +35,7 @@ Namespace NetworkModel.StringDB
                            In PTT.GeneObjects.AsParallel
                            Select New XGMML.Node With {
                                .label = GeneObject.Synonym,
-                               .Attributes = __attributes(GeneObject)}).ToArray.AddHandle '使用PTT文件首先生成节点
+                               .Attributes = __attributes(GeneObject)}).AddHandle '使用PTT文件首先生成节点
 
             Dim Network As New List(Of Edge)
 
@@ -50,11 +51,11 @@ Namespace NetworkModel.StringDB
                 Call Console.Write(".")
             Next
 
-            Model.Edges = Network.ToArray.AddHandle
+            Model.Edges = Network.AddHandle
 
             Dim nodes = Model.Nodes.ToDictionary(Function(obj) obj.id,
                                                  Function(obj) New Value(Of Integer)(0))
-            For Each edge In Model.Edges
+            For Each edge As Edge In Model.Edges
                 nodes(edge.source).Value += 1
                 nodes(edge.target).Value += 1
             Next
@@ -64,11 +65,24 @@ Namespace NetworkModel.StringDB
             Next
 
             If TrimDegree > -1 Then
-
-                Dim LQuery As Integer() = (From x In nodes Where x.Value.Value >= TrimDegree Select x.Key).ToArray
-                Model.Nodes = (From node As XGMML.Node In Model.Nodes Where Array.IndexOf(LQuery, node.id) > -1 Select node).ToArray
-                LQuery = (From item In nodes Where item.Value.Value < TrimDegree Select item.Key).ToArray
-                Model.Edges = (From edge As Edge In Model.Edges.AsParallel Where Not edge.ContainsOneOfNode(LQuery) Select edge).ToArray
+                Dim LQuery As Integer() =
+                    LinqAPI.Exec(Of Integer) <= From x In nodes
+                                                Where x.Value.Value >= TrimDegree
+                                                Select x.Key
+                Model.Nodes =
+                    LinqAPI.Exec(Of XGMML.Node) <= From node As XGMML.Node
+                                                   In Model.Nodes
+                                                   Where Array.IndexOf(LQuery, node.id) > -1
+                                                   Select node
+                LQuery =
+                    LinqAPI.Exec(Of Integer) <= From x In nodes
+                                                Where x.Value.Value < TrimDegree
+                                                Select x.Key
+                Model.Edges =
+                    LinqAPI.Exec(Of Edge) <= From edge As Edge
+                                             In Model.Edges.AsParallel
+                                             Where Not edge.ContainsOneOfNode(LQuery)
+                                             Select edge
             End If
 
             Return Model
@@ -84,18 +98,25 @@ Namespace NetworkModel.StringDB
             EdgeModel.Label = $"{source}::{target}"
 
             Dim attrs As New List(Of Attribute)
-            Call attrs.Add(New Attribute With {
-                           .Type = ATTR_VALUE_TYPE_REAL,
-                           .Name = $"{NameOf(edge.ConfidenceList)}-{edge.ConfidenceList.First.Unit.Names.ShortLabel}",
-                           .Value = edge.ConfidenceList.First.value})
+            attrs += New Attribute With {
+                .Type = ATTR_VALUE_TYPE_REAL,
+                .Name = $"{NameOf(edge.ConfidenceList)}-{edge.ConfidenceList.First.Unit.Names.ShortLabel}",
+                .Value = edge.ConfidenceList.First.value
+            }
 
             Dim experiment = itr.GetExperiment(edge.ExperimentList.First.value)
 
             If Not experiment Is Nothing Then
-                Call attrs.Add(New Attribute With {
-                         .Type = ATTR_VALUE_TYPE_STRING,
-                         .Name = $"{NameOf(edge.ExperimentList)}-{If(experiment.Names Is Nothing, experiment.interactionDetectionMethod.Names.ShortLabel, experiment.Names.ShortLabel)}",
-                         .Value = experiment.Bibref.Xref.PrimaryReference.Db & ": " & experiment.Bibref.Xref.PrimaryReference.Id})
+                Dim name As String =
+                    If(experiment.Names Is Nothing,
+                    experiment.interactionDetectionMethod.Names.ShortLabel,
+                    experiment.Names.ShortLabel)
+
+                attrs += New Attribute With {
+                    .Type = ATTR_VALUE_TYPE_STRING,
+                    .Name = $"{NameOf(edge.ExperimentList)}-{name}",
+                    .Value = experiment.Bibref.Xref.PrimaryReference.Db & ": " & experiment.Bibref.Xref.PrimaryReference.Id
+                }
             End If
 
             EdgeModel.Attributes = attrs.ToArray

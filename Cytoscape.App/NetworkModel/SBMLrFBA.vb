@@ -8,6 +8,7 @@ Imports LANS.SystemsBiology.Assembly.SBML.Level2
 Imports LANS.SystemsBiology.Assembly.SBML.Level2.Elements
 Imports LANS.SystemsBiology.Assembly.SBML.Specifics.MetaCyc
 Imports LANS.SystemsBiology.Assembly.SBML.Components
+Imports Microsoft.VisualBasic.Language
 
 Namespace NetworkModel
 
@@ -21,25 +22,29 @@ Namespace NetworkModel
 
         <ExportAPI("NET.Generate")>
         Public Function CreateNetwork(model As XmlFile, flux As IEnumerable(Of FBA_OUTPUT.TabularOUT)) As Network
-            Dim ZEROS = (From x As FBA_OUTPUT.TabularOUT In flux
-                         Where x.Flux = 0R
-                         Select x.Rxn).ToArray      ' 移除流量为零的过程
-            Dim nZ = (From x As Reaction In model.Model.listOfReactions
-                      Where Array.IndexOf(ZEROS, x.id) = -1  ' 得到所有非零的过程
-                      Select x).ToArray
+            Dim ZEROS As String() =
+                LinqAPI.Exec(Of String) <= From x As FBA_OUTPUT.TabularOUT
+                                           In flux
+                                           Where x.Flux = 0R
+                                           Select x.Rxn     ' 移除流量为零的过程
+            Dim nZ As Reaction() =
+                LinqAPI.Exec(Of Reaction) <= From x As Reaction
+                                             In model.Model.listOfReactions
+                                             Where Array.IndexOf(ZEROS, x.id) = -1  ' 得到所有非零的过程
+                                             Select x
             Dim fluxValue As Dictionary(Of String, Double) =
                 flux.ToDictionary(Function(x) x.Rxn,
                                   Function(x) x.Flux)
             Dim allCompounds = (From x As Reaction
                                 In nZ
-                                Select x.GetMetabolites.ToArray(
+                                Select x.GetMetabolites.Select(
                                     Function(xx) xx.species)).MatrixAsIterator.Distinct.ToArray
             Dim nodes = allCompounds.ToArray(
                 Function(x) New Node With {
                     .Identifier = x,
                     .NodeType = "Metabolite"})
-            Dim fluxNodes = nZ.ToArray(Function(x) __flux2Node(x, fluxValue))
-            Dim edges As NetworkEdge() = nZ.ToArray(Function(x) __flux2Edges(x)).MatrixToVector
+            Dim fluxNodes As Node() = nZ.ToArray(Function(x) __flux2Node(x, fluxValue))
+            Dim edges As NetworkEdge() = nZ.Select(AddressOf __flux2Edges).MatrixToVector
             Return New Network With {
                 .Edges = edges,
                 .Nodes = nodes.Join(fluxNodes).ToArray
