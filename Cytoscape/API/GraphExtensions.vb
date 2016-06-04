@@ -20,14 +20,15 @@ Namespace API
             Dim nodes As Network.Graph.Node() =
                 LinqAPI.Exec(Of Network.Graph.Node) <= From n As XGMML.Node
                                                        In g.Nodes
-                                                       Select New Network.Graph.Node(n.label)
+                                                       Select New Network.Graph.Node(n.id)
+            Dim nodeHash As New Dictionary(Of Network.Graph.Node)(nodes)
             Dim edges As Network.Graph.Edge() =
                 LinqAPI.Exec(Of Network.Graph.Edge) <= From edge As XGMML.Edge
                                                        In g.Edges
                                                        Select New Network.Graph.Edge(
                                                            CStr(edge.Id),
-                                                           nodes(edge.source),
-                                                           nodes(edge.target),
+                                                           nodeHash(edge.source),
+                                                           nodeHash(edge.target),
                                                            New EdgeData)
             Dim net As New NetworkGraph() With {
                 .nodes = New List(Of Network.Graph.Node)(nodes),
