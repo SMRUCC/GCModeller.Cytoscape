@@ -3,6 +3,8 @@ Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscap
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.DataVisualization.Network.Graph
+Imports Microsoft.VisualBasic.DataVisualization.Network.Layouts
+Imports Microsoft.VisualBasic.DataVisualization.Network.Layouts.Interfaces
 
 Module Module1
 
@@ -16,6 +18,24 @@ Module Module1
 
         Dim g = Graph.Load("F:\GCModeller\GCI Project\DataVisualization\Cytoscape\test.cytoscape.xgmml")
         Dim net As NetworkGraph = g.CreateGraph
+
+
+        Dim stiffness = 81.76F
+        Dim repulsion = 40000.0F
+        Dim damping = 0.5F
+
+
+        Dim m_fdgPhysics = New ForceDirected2D(net, '// instance of Graph
+        stiffness, '// stiffness of the spring
+                                                   repulsion, '// Node repulsion rate 
+                                                   damping    '// damping rate  
+                                                   )
+
+        ' Dim m_fdgRenderer As New IRenderer(m_fdgPhysics)
+
+        '  Dim timeStep = 0.05F
+        '   m_fdgRenderer.Draw(timeStep)
+
 
         '   Call g.Save("x:\gggggg\ddddd.xml")
 
