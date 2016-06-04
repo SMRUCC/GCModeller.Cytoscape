@@ -10,6 +10,11 @@ Namespace API
 
     Public Module GraphExtensions
 
+        ''' <summary>
+        ''' Creates the network graph model from the Cytoscape data model to generates the network layout or visualization 
+        ''' </summary>
+        ''' <param name="g"></param>
+        ''' <returns></returns>
         <Extension>
         Public Function CreateGraph(g As Graph) As NetworkGraph
             Dim nodes As Network.Graph.Node() =
