@@ -147,6 +147,7 @@
   <ItemGroup>
     <Compile Include="API\ImportantNodes\LDM.vb" />
     <Compile Include="API\ImportantNodes\ImportantNodes.vb" />
+    <Compile Include="API\GraphExtensions.vb" />
     <Compile Include="Tabular\EdgeTable.vb" />
     <Compile Include="Tabular\NodeTable.vb" />
     <Compile Include="Graph\Cyjs.vb" />
