@@ -5,6 +5,7 @@ Imports Microsoft.VisualBasic.Imaging
 Namespace CytoscapeGraphView.XGMML
 
     Public Class NodeGraphics : Inherits AttributeDictionary
+
         <XmlAttribute("outline")> Public Property Outline As String
         <XmlAttribute> Public Property z As String
         <XmlAttribute("type")> Public Property Type As String
@@ -45,6 +46,12 @@ Namespace CytoscapeGraphView.XGMML
                 Return New Font(FontFace.MicrosoftYaHei, size)
             End If
         End Function
+
+        Public ReadOnly Property radius As Single
+            Get
+                Return Math.Sqrt(w ^ 2 + h ^ 2) / 2
+            End Get
+        End Property
 
         Public ReadOnly Property LabelColor As Color
             Get

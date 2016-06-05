@@ -20,22 +20,39 @@ Namespace API
             Dim nodes As Network.Graph.Node() =
                 LinqAPI.Exec(Of Network.Graph.Node) <= From n As XGMML.Node
                                                        In g.Nodes
-                                                       Select New Network.Graph.Node(n.id)
+                                                       Select n.__node()
             Dim nodeHash As New Dictionary(Of Network.Graph.Node)(nodes)
             Dim edges As Network.Graph.Edge() =
                 LinqAPI.Exec(Of Network.Graph.Edge) <= From edge As XGMML.Edge
                                                        In g.Edges
-                                                       Select New Network.Graph.Edge(
-                                                           CStr(edge.Id),
-                                                           nodeHash(edge.source),
-                                                           nodeHash(edge.target),
-                                                           New EdgeData)
+                                                       Select edge.__edge(nodeHash)
             Dim net As New NetworkGraph() With {
                 .nodes = New List(Of Network.Graph.Node)(nodes),
                 .edges = New List(Of Network.Graph.Edge)(edges)
             }
 
             Return net
+        End Function
+
+        <Extension>
+        Private Function __node(n As XGMML.Node) As Network.Graph.Node
+            Dim data As New NodeData With {
+                .Color = n.Graphics.FillColor,
+                .radius = n.Graphics.radius
+            }
+
+            Return New Network.Graph.Node(n.id, data)
+        End Function
+
+        <Extension>
+        Private Function __edge(edge As XGMML.Edge, nodeHash As Dictionary(Of Network.Graph.Node)) As Network.Graph.Edge
+            Dim data As New EdgeData
+
+            Return New Network.Graph.Edge(
+                CStr(edge.Id),
+                nodeHash(edge.source),
+                nodeHash(edge.target),
+                data)
         End Function
     End Module
 End Namespace
