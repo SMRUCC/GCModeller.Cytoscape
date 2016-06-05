@@ -5,6 +5,7 @@ Imports Microsoft.VisualBasic.DataVisualization
 Imports Microsoft.VisualBasic.DataVisualization.Network.Graph
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic
+Imports System.Drawing
 
 Namespace API
 
@@ -37,7 +38,7 @@ Namespace API
         <Extension>
         Private Function __node(n As XGMML.Node) As Network.Graph.Node
             Dim data As New NodeData With {
-                .Color = n.Graphics.FillColor,
+                .Color = New SolidBrush(n.Graphics.FillColor),
                 .radius = n.Graphics.radius
             }
 
