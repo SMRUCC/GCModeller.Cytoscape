@@ -36,8 +36,9 @@ Module Module1
 
         Call m_fdgPhysics.Updates(net)
 
+        Call net.ApplyAnalysis
 
-        Dim ress As Image = net.DrawImage(New Size(1024, 768))
+        Dim ress As Image = net.DrawImage(New Size(1024, 768), displayId:=False)
 
         Call ress.SaveAs("x:\gggg.bmp",)
 

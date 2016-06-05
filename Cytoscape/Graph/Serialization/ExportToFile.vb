@@ -3,7 +3,7 @@ Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.Reflection.Refl
 Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream.Node
 Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream.NetworkEdge
 Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream.NameOf
-Imports Microsoft.VisualBasic.DataVisualization.Network.LDM.Abstract
+Imports Microsoft.VisualBasic.DataVisualization.Network.Abstract
 Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.ComponentModels
 Imports Microsoft.VisualBasic.DataVisualization.Network
 Imports Microsoft.VisualBasic
@@ -133,7 +133,7 @@ Namespace CytoscapeGraphView.Serialization
 
         Private Function __mapInterface(schema As SchemaProvider) As Dictionary(Of String, String)
             Dim mapEdge = schema.DeclaringType.GetInterfaceMap(GetType(INetworkEdge))
-            Dim mapNodes = schema.DeclaringType.GetInterfaceMap(GetType(I_InteractionModel))
+            Dim mapNodes = schema.DeclaringType.GetInterfaceMap(GetType(IInteraction))
             Dim maps As New Dictionary(Of String, String)
 
             Dim edgeMaps = (From i As Integer
@@ -151,8 +151,8 @@ Namespace CytoscapeGraphView.Serialization
                                 mMethod = mapNodes.TargetMethods(i)) _
                                 .ToDictionary(Function(x) x.interface.Name.Replace(propGET, ""))
 
-            Dim map = nodeMaps(NameOf(I_InteractionModel.locusId)) : Call maps.Add(REFLECTION_ID_MAPPING_FROM_NODE, __getMap(map.interface, map.mMethod, schema))
-            map = nodeMaps(NameOf(I_InteractionModel.Address)) : Call maps.Add(REFLECTION_ID_MAPPING_TO_NODE, __getMap(map.interface, map.mMethod, schema))
+            Dim map = nodeMaps(NameOf(IInteraction.source)) : Call maps.Add(REFLECTION_ID_MAPPING_FROM_NODE, __getMap(map.interface, map.mMethod, schema))
+            map = nodeMaps(NameOf(IInteraction.target)) : Call maps.Add(REFLECTION_ID_MAPPING_TO_NODE, __getMap(map.interface, map.mMethod, schema))
             map = edgeMaps(NameOf(INetworkEdge.Confidence)) : Call maps.Add(REFLECTION_ID_MAPPING_CONFIDENCE, __getMap(map.interface, map.mMethod, schema))
             map = edgeMaps(NameOf(INetworkEdge.InteractionType)) : Call maps.Add(REFLECTION_ID_MAPPING_INTERACTION_TYPE, __getMap(map.interface, map.mMethod, schema))
 

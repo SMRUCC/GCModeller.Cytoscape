@@ -1,6 +1,6 @@
 ﻿Imports System.Text
 Imports Microsoft.VisualBasic.ComponentModel
-Imports Microsoft.VisualBasic.DataVisualization.Network.LDM.Abstract
+Imports Microsoft.VisualBasic.DataVisualization.Network.Abstract
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports System.Web.Script.Serialization
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
@@ -113,8 +113,8 @@ Namespace CytoscapeGraphView.Cyjs
     Public Class EdgeData : Inherits Data
         Implements INetworkEdge
 
-        Public Property source As String Implements I_InteractionModel.locusId
-        Public Property target As String Implements I_InteractionModel.Address
+        Public Property source As String Implements IInteraction.source
+        Public Property target As String Implements IInteraction.target
         Public Property Confidence As Double Implements INetworkEdge.Confidence
         Public Property EdgeBetweenness As Double
         Public Property interaction As String Implements INetworkEdge.InteractionType
