@@ -1,4 +1,5 @@
 ﻿Imports System.Drawing
+Imports System.Runtime.CompilerServices
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 Imports LANS.SystemsBiology.Assembly.KEGG.DBGET.ReferenceMap
 Imports LANS.SystemsBiology.GCModeller.DataVisualization
@@ -124,56 +125,68 @@ Namespace CytoscapeGraphView
         ''' <param name="Size"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function InvokeDrawing(Graph As Graph, refMap As ReferenceMapData, map As String(), Optional Size As String = "", Optional alpha As Integer = 255, Optional Scale As Double = 1) As Image
-            Dim _size As Size = If(String.IsNullOrEmpty(Size), Graph.GetSize(Scale), New Size(Val(Size.Split(CChar(",")).First), Val(Size.Split(CChar(",")).Last)))
-            Dim Gr = _size.CreateGDIDevice
-            Dim offset As Point = New Point(30, 35)
+        ''' 
+        <Extension>
+        Public Function InvokeDrawing(Graph As Graph,
+                                      refMap As ReferenceMapData,
+                                      map As String(),
+                                      Optional Size As String = "",
+                                      Optional alpha As Integer = 255,
+                                      Optional Scale As Double = 1) As Image
 
-            Call Size.__DEBUG_ECHO
+            Dim _size As Size = If(String.IsNullOrEmpty(Size),
+                Graph.GetSize(Scale),
+                New Size(Val(Size.Split(CChar(",")).First), Val(Size.Split(CChar(",")).Last)))
 
-            Dim Nodes = Graph.Nodes.ToDictionary(Function(n) n.id)
-            Dim Colors = GenerateColorProfiles(map)
+            Using gdi As GDIPlusDeviceHandle = _size.CreateGDIDevice
+                Dim offset As Point = New Point(30, 35)
 
-            For Each Edge In Graph.Edges
-                Dim pt1 = Nodes(Edge.source), pt2 = Nodes(Edge.target)
-                Call Gr.Graphics.DrawLine(New Pen(Brushes.Gray, 2),
-                                           GDIPlusExtensions.OffSet(New Point(pt1.Graphics.x * Scale, pt1.Graphics.y * Scale), offset.X, offset.Y),
-                                           GDIPlusExtensions.OffSet(New Point(pt2.Graphics.x * Scale, pt2.Graphics.y * Scale), offset.X, offset.Y))
-            Next
+                Call Size.__DEBUG_ECHO
 
-            For Each Node In Graph.Nodes
-                Dim Orthology = refMap.GetReaction(Node("KEGG_ENTRY").Value).SSDBs
-                Dim KO_sp As String() = (From Entry In (From ort In Orthology Select ort.Value).ToArray.MatrixToList Select Entry.SpeciesId Distinct).ToArray
-                Dim ColorList = (From sp As String In KO_sp Where Colors.ContainsKey(sp) Select sp, sp_Color = Colors(sp)).ToArray
-                Dim Color As Color
+                Dim Nodes = Graph.Nodes.ToDictionary(Function(n) n.id)
+                Dim Colors = GenerateColorProfiles(map)
 
-                If Not ColorList.IsNullOrEmpty Then
-                    Dim R = (From cl In ColorList Select clR = CDbl(cl.sp_Color.R)).ToArray.Average
-                    Dim G = (From cl In ColorList Select clG = CDbl(cl.sp_Color.G)).ToArray.Average
-                    Dim B = (From cl In ColorList Select clB = CDbl(cl.sp_Color.B)).ToArray.Average
-                    Color = Drawing.Color.FromArgb(alpha, R, G, B)
+                For Each Edge In Graph.Edges
+                    Dim pt1 = Nodes(Edge.source), pt2 = Nodes(Edge.target)
+                    Call gdi.DrawLine(New Pen(Brushes.Gray, 2),
+                                     New Point(pt1.Graphics.x * Scale, pt1.Graphics.y * Scale).OffSet2D(offset),
+                                     New Point(pt2.Graphics.x * Scale, pt2.Graphics.y * Scale).OffSet2D(offset))
+                Next
 
-                    Call Gr.Graphics.DrawString(String.Join("; ", (From cl In ColorList Select cl.sp).ToArray), New Font(FontFace.Ubuntu, 6), Brushes.Red, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale - Node.Graphics.h * 0.2))
-                Else
-                    Color = System.Drawing.Color.FromArgb(alpha, Drawing.Color.Blue)
-                End If
+                For Each Node In Graph.Nodes
+                    Dim Orthology = refMap.GetReaction(Node("KEGG_ENTRY").Value).SSDBs
+                    Dim KO_sp As String() = (From Entry In (From ort In Orthology Select ort.Value).ToArray.MatrixToList Select Entry.SpeciesId Distinct).ToArray
+                    Dim ColorList = (From sp As String In KO_sp Where Colors.ContainsKey(sp) Select sp, sp_Color = Colors(sp)).ToArray
+                    Dim Color As Color
 
-                Dim IsPie As Boolean
-                Dim Rect As Rectangle = __calculation(Node, IsPie, offset, Scale)
-                ' Dim BigRect As Rectangle = New Rectangle(Microsoft.VisualBasic.OffSet(Rect.Location, 5, 5), New Size(Rect.Size.Width + 2.5, Rect.Height + 2.5))
+                    If Not ColorList.IsNullOrEmpty Then
+                        Dim R = (From cl In ColorList Select clR = CDbl(cl.sp_Color.R)).ToArray.Average
+                        Dim G = (From cl In ColorList Select clG = CDbl(cl.sp_Color.G)).ToArray.Average
+                        Dim B = (From cl In ColorList Select clB = CDbl(cl.sp_Color.B)).ToArray.Average
+                        Color = Drawing.Color.FromArgb(alpha, R, G, B)
 
-                If IsPie Then
-                    '     Call Gr.Gr_Device.FillPie(Brushes.White, BigRect, 0, 360)
-                    Call Gr.Graphics.FillPie(New SolidBrush(Color), Rect, 0, 360)
-                Else
-                    '   Call Gr.Gr_Device.FillRectangle(Brushes.White, BigRect)
-                    Call Gr.Graphics.FillRectangle(New SolidBrush(Color), Rect)
-                End If
+                        Call gdi.Graphics.DrawString(String.Join("; ", (From cl In ColorList Select cl.sp).ToArray), New Font(FontFace.Ubuntu, 6), Brushes.Red, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale - Node.Graphics.h * 0.2))
+                    Else
+                        Color = System.Drawing.Color.FromArgb(alpha, Drawing.Color.Blue)
+                    End If
 
-                Call Gr.Graphics.DrawString(Node.label, New Font("Ubuntu", 10), Brushes.Black, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale))
-            Next
+                    Dim IsPie As Boolean
+                    Dim Rect As Rectangle = __calculation(Node, IsPie, offset, Scale)
+                    ' Dim BigRect As Rectangle = New Rectangle(Microsoft.VisualBasic.OffSet(Rect.Location, 5, 5), New Size(Rect.Size.Width + 2.5, Rect.Height + 2.5))
 
-            Return Gr.ImageResource
+                    If IsPie Then
+                        '     Call Gr.Gr_Device.FillPie(Brushes.White, BigRect, 0, 360)
+                        Call gdi.Graphics.FillPie(New SolidBrush(Color), Rect, 0, 360)
+                    Else
+                        '   Call Gr.Gr_Device.FillRectangle(Brushes.White, BigRect)
+                        Call gdi.Graphics.FillRectangle(New SolidBrush(Color), Rect)
+                    End If
+
+                    Call gdi.Graphics.DrawString(Node.label, New Font("Ubuntu", 10), Brushes.Black, New Point(Node.Graphics.x * Scale, Node.Graphics.y * Scale))
+                Next
+
+                Return gdi.ImageResource
+            End Using
         End Function
 
         Private Function __calculation(Node As XGMML.Node, ByRef IsPie As Boolean, OffSet As Point, Scale As Integer) As Rectangle
@@ -191,11 +204,12 @@ Namespace CytoscapeGraphView
             End If
 
             Dim RectSize = New Size(Node.Graphics.w * Degree, Node.Graphics.h * Degree)
-            Dim RectLoc As Point = New Point(Node.Graphics.x * Scale - RectSize.Width / 2, Node.Graphics.y * Scale - RectSize.Height / 2)
+            Dim RectLoc As New Point(Node.Graphics.x * Scale - RectSize.Width / 2,
+                                     Node.Graphics.y * Scale - RectSize.Height / 2)
 
             IsPie = Not rt > 0.05
 
-            Return New Rectangle(GDIPlusExtensions.OffSet(RectLoc, OffSet.X, OffSet.Y), RectSize)
+            Return New Rectangle(RectLoc.OffSet2D(OffSet), RectSize)
         End Function
     End Module
 End Namespace

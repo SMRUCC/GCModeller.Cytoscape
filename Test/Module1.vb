@@ -1,10 +1,13 @@
-﻿Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.API
+﻿Imports System.Drawing
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.API
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
 Imports Microsoft.VisualBasic
+Imports Microsoft.VisualBasic.DataVisualization.Network
 Imports Microsoft.VisualBasic.DataVisualization.Network.Graph
 Imports Microsoft.VisualBasic.DataVisualization.Network.Layouts
 Imports Microsoft.VisualBasic.DataVisualization.Network.Layouts.Interfaces
+Imports Microsoft.VisualBasic.Imaging
 
 Module Module1
 
@@ -31,6 +34,13 @@ Module Module1
                                                    damping    '// damping rate  
                                                    )
 
+        Call m_fdgPhysics.Updates(net)
+
+
+        Dim ress As Image = net.DrawImage(New Size(1024, 768))
+
+        Call ress.SaveAs("x:\gggg.bmp",)
+
         ' Dim m_fdgRenderer As New IRenderer(m_fdgPhysics)
 
         '  Dim timeStep = 0.05F
@@ -45,4 +55,6 @@ Module Module1
         xml.xmlns.Set("ggy", "oK!")
         Call xml.Save("x:\dddd.xml", Encodings.UTF8)
     End Function
+
+
 End Module
