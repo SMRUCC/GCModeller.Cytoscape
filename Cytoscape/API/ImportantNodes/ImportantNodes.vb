@@ -1,13 +1,14 @@
-﻿Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.Tables
+﻿Imports System.Runtime.CompilerServices
+Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.Tables
 Imports LANS.SystemsBiology.InteractionModel
+Imports LANS.SystemsBiology.InteractionModel.Regulon
+Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.DocumentFormat.Csv
 Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.Reflection
-Imports Microsoft.VisualBasic.Scripting.MetaData
-Imports Microsoft.VisualBasic
-Imports Microsoft.VisualBasic.Linq
-Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic.Language
+Imports Microsoft.VisualBasic.Linq
+Imports Microsoft.VisualBasic.Scripting.MetaData
 
 Namespace API.ImportantNodes
 
