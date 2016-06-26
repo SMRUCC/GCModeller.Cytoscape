@@ -5,7 +5,7 @@ Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscap
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.Visualization
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.Scripting.MetaData
-Imports Microsoft.VisualBasic.Serialization
+Imports Microsoft.VisualBasic.Serialization.JSON
 
 <PackageNamespace("Cytoscape.CLI",
                   Category:=APICategories.CLI_MAN,

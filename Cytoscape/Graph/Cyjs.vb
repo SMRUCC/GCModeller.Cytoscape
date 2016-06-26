@@ -4,6 +4,7 @@ Imports Microsoft.VisualBasic.DataVisualization.Network.Abstract
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports System.Web.Script.Serialization
 Imports LANS.SystemsBiology.AnalysisTools.DataVisualization.Interaction.Cytoscape.CytoscapeGraphView.XGMML
+Imports Microsoft.VisualBasic.Serialization.JSON
 
 Namespace CytoscapeGraphView.Cyjs
 
@@ -35,7 +36,7 @@ Namespace CytoscapeGraphView.Cyjs
         End Function
 
         Protected Function __json() As String
-            Dim json As StringBuilder = New StringBuilder(Microsoft.VisualBasic.Serialization.GetJson(Me))
+            Dim json As New StringBuilder(GetJson())
 
             If Me.elements Is Nothing Then
                 elements = New Network
