@@ -21,6 +21,8 @@ Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic
 Imports LANS.SystemsBiology.Assembly.NCBI.COG
 Imports LANS.SystemsBiology.NCBI.Extensions.LocalBLAST.Application.RpsBLAST
+Imports Microsoft.VisualBasic.Linq
+Imports Microsoft.VisualBasic.Language
 
 Partial Module CLI
 
@@ -100,14 +102,15 @@ Partial Module CLI
         Dim Clusters As ClusterCollection(Of KMeans.Entity) = KMeans.ClusterDataSet(nClusters, Maps)
         Dim result As New List(Of EntityLDM)
         Dim i As Integer = 1
+        Dim setValue = New SetValue(Of EntityLDM) <= NameOf(EntityLDM.Cluster)
 
         For Each cluster As Cluster(Of KMeans.Entity) In Clusters
             Dim array As EntityLDM()
 
             If mapNames Is Nothing Then
-                array = cluster.ToArray(Function(x) x.ToLDM.InvokeSet(NameOf(EntityLDM.Cluster), CStr(i)))
+                array = cluster.ToArray(Function(x) setValue(x.ToLDM, CStr(i)))
             Else
-                array = cluster.ToArray(Function(x) x.ToLDM(mapNames).InvokeSet(NameOf(EntityLDM.Cluster), CStr(i)))
+                array = cluster.ToArray(Function(x) setValue(x.ToLDM(mapNames), CStr(i)))
             End If
             Call result.Add(array)
             Call i.MoveNext
@@ -394,13 +397,17 @@ Partial Module CLI
     ''' <param name="maps"></param>
     ''' <returns></returns>
     Private Function __getMaxRelates(source As IEnumerable(Of EntityLDM), cut As Double, maps As Dictionary(Of String, String)) As List(Of EntityLDM)
-        Dim LQuery = (From x As EntityLDM In source
-                      Let cuts As Dictionary(Of String, Double) =
-                          (From p In x.Properties
-                           Where Math.Abs(p.Value) >= cut
-                           Let mapId As String = maps(p.Key)
-                           Select New KeyValuePair(Of String, Double)(mapId, p.Value)).ToDictionary(True)
-                      Select x.InvokeSet(NameOf(x.Properties), cuts)).ToList
+        Dim setValue = New SetValue(Of EntityLDM) <= NameOf(EntityLDM.Properties)
+        Dim LQuery =
+            LinqAPI.MakeList(Of EntityLDM) <= From x As EntityLDM
+                                              In source
+                                              Let cuts As Dictionary(Of String, Double) = (
+                                                  From p
+                                                  In x.Properties
+                                                  Where Math.Abs(p.Value) >= cut
+                                                  Let mapId As String = maps(p.Key)
+                                                  Select New KeyValuePair(Of String, Double)(mapId, p.Value)).ToDictionary(True)
+                                              Select setValue(x, cuts)
         Return LQuery
     End Function
 
