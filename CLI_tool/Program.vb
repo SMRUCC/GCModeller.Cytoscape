@@ -1,4 +1,4 @@
-﻿#Region "Microsoft.VisualBasic::357c178a71d94da0048eddfa13e1c1ee, ..\interops\visualize\Cytoscape\Cytoscape\Graph\VizMap\visualStyle\edge.vb"
+﻿#Region "Microsoft.VisualBasic::ceb03a3cec8233f395b33cb8bab73134, ..\interops\visualize\Cytoscape\Cytoscape\Cli\Cytoscape\Program.vb"
 
     ' Author:
     ' 
@@ -25,8 +25,21 @@
 
 #End Region
 
-Namespace Visualization
+Imports Microsoft.VisualBasic.DocumentFormat.Csv
 
-    Public Class edge : Inherits visualNode
-    End Class
-End Namespace
+Module Program
+
+    Public Function Main() As Integer
+        Return GetType(CLI).RunCLI(App.CommandLine)
+    End Function
+End Module
+
+
+Public Class genome
+    Public Property gi As String
+    Public Property Sum As Double
+    Public Property w As Double
+    Public Property hit_name As String
+    Public Property name As String
+
+End Class
