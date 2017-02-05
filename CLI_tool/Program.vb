@@ -1,33 +1,35 @@
-﻿#Region "Microsoft.VisualBasic::ceb03a3cec8233f395b33cb8bab73134, ..\interops\visualize\Cytoscape\Cytoscape\Cli\Cytoscape\Program.vb"
+﻿#Region "Microsoft.VisualBasic::a144c4b54ecf169cfdd26ab4061adc05, ..\interops\visualize\Cytoscape\CLI_tool\Program.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
-Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
+Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream
+Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic
+Imports Microsoft.VisualBasic.Language
 
 Module Program
 
@@ -98,8 +100,8 @@ Module Program
     End Class
 
     Public Sub ExportNetwork()
-        Dim snp_human As DocumentStream.File = DocumentStream.File.Load("C:\Users\xieguigang\Desktop\New folder\8.3\SNP_Viral_Network\SNP-Human.csv")
-        Dim viral_human As DocumentStream.File = DocumentStream.File.Load("C:\Users\xieguigang\Desktop\New folder\8.3\SNP_Viral_Network\Viral-Human.csv")
+        Dim snp_human As IO.File = IO.File.Load("C:\Users\xieguigang\Desktop\New folder\8.3\SNP_Viral_Network\SNP-Human.csv")
+        Dim viral_human As IO.File = IO.File.Load("C:\Users\xieguigang\Desktop\New folder\8.3\SNP_Viral_Network\Viral-Human.csv")
         Dim commons As String() = "C:\Users\xieguigang\Desktop\New folder\8.3\SNP_Viral_Network\commons.csv".ReadAllLines
         Dim nodes As New Dictionary(Of Node)
         Dim types As String() = snp_human.First.ToArray
@@ -110,7 +112,7 @@ Module Program
 
             If Not nodes.ContainsKey(key) Then
                 nodes += New Node With {
-                    .Identifier = key,
+                    .ID = key,
                     .NodeType = types(0),
                     .Properties = New Dictionary(Of String, String) From {{"display", row(0)}}
                 }
@@ -120,7 +122,7 @@ Module Program
 
             If Not nodes.ContainsKey(key2) Then
                 nodes += New Node With {
-                    .Identifier = key2,
+                    .ID = key2,
                     .NodeType = types(1),
                     .Properties = New Dictionary(Of String, String) From {{"display", row(1)}}
                 }
@@ -135,13 +137,13 @@ Module Program
             Dim key As String = $"{types(0)}-{row(0)}".Replace(" ", "_")
 
             If Not nodes.ContainsKey(key) Then
-                nodes += New Node With {.Identifier = key, .NodeType = types(0), .Properties = New Dictionary(Of String, String) From {{"display", row(0)}}}
+                nodes += New Node With {.ID = key, .NodeType = types(0), .Properties = New Dictionary(Of String, String) From {{"display", row(0)}}}
             End If
 
             Dim key2 = $"{types(1)}-{row(1)}".Replace(" ", "_")
 
             If Not nodes.ContainsKey(key2) Then
-                nodes += New Node With {.Identifier = key2, .NodeType = types(1), .Properties = New Dictionary(Of String, String) From {{"display", row(1)}}}
+                nodes += New Node With {.ID = key2, .NodeType = types(1), .Properties = New Dictionary(Of String, String) From {{"display", row(1)}}}
             End If
 
             net += New NetworkEdge With {.ToNode = key, .FromNode = key2, .InteractionType = "Viral - HumanProtein"}

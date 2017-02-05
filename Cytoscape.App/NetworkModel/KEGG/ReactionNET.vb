@@ -1,33 +1,34 @@
-﻿#Region "Microsoft.VisualBasic::84f4cd69ca04c0b117333700db69e424, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\ReactionNET.vb"
+﻿#Region "Microsoft.VisualBasic::ab86a727c9f09f82afaf3206094511c3, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\ReactionNET.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CommandLine.Reflection
-Imports Microsoft.VisualBasic.DataVisualization.Network
+Imports Microsoft.VisualBasic.Data.visualize.Network
 Imports Microsoft.VisualBasic.Linq
 Imports Microsoft.VisualBasic.Scripting.MetaData
 Imports SMRUCC.genomics.Visualize.Cytoscape.GCModeller.FileSystem
@@ -72,7 +73,7 @@ Namespace NetworkModel.KEGG
                             Select (From cp As CompoundSpecieReference
                                     In LDM.GetMetabolites
                                     Select cp.Identifier,
-                                        rxn = x)).MatrixAsIterator
+                                        rxn = x)).IteratesALL
             Dim hash = (From x In preCache
                         Select x
                         Group x By x.Identifier Into Group) _
@@ -102,15 +103,15 @@ Namespace NetworkModel.KEGG
         Public Function BuildNET(source As IEnumerable(Of bGetObject.Reaction)) As FileStream.Network
             Dim cpHash = BuildCompoundHash(source)
             Dim nodes As New List(Of FileStream.Node)
-            Dim nodeTmp As FileStream.Node() = source.ToArray(Function(x) New FileStream.Node With {.Identifier = x.Entry, .NodeType = "Flux"})
+            Dim nodeTmp As FileStream.Node() = source.ToArray(Function(x) New FileStream.Node With {.ID = x.Entry, .NodeType = "Flux"})
             Call nodes.AddRange(nodeTmp)
             nodeTmp = cpHash.ToArray(Function(x) New FileStream.Node With {
-                                         .Identifier = x.Key,
+                                         .ID = x.Key,
                                          .NodeType = "Metabolite",
                                          .Properties = New Dictionary(Of String, String) From {{"associate", x.Value.Length}}})
             Call nodes.AddRange(nodeTmp)
 
-            Dim edges As FileStream.NetworkEdge() = cpHash.ToArray(Function(x) __buildNET(x.Key, x.Value), Parallel:=True).MatrixToVector
+            Dim edges As FileStream.NetworkEdge() = cpHash.ToArray(Function(x) __buildNET(x.Key, x.Value), Parallel:=True).ToVector
 
             Return New FileStream.Network With {
                 .Edges = edges.ToArray,
@@ -128,10 +129,10 @@ Namespace NetworkModel.KEGG
                                                                                 .ToDictionary(Function(x) x.Entry,
                                                                                               Function(x) x.Group.ToArray)
             Dim mapsSource = (From x As String
-                              In maps.ToArray(Function(xx) xx.ECMaps.ToArray(Function(xxx) xxx.Reactions)).MatrixAsIterator.MatrixAsIterator
+                              In maps.ToArray(Function(xx) xx.ECMaps.ToArray(Function(xxx) xxx.Reactions)).IteratesALL.IteratesALL
                               Where source.ContainsKey(x)
-                              Select source(x)).MatrixAsIterator
-            Dim rxns = (From x In source.Values.MatrixAsIterator
+                              Select source(x)).IteratesALL
+            Dim rxns = (From x In source.Values.IteratesALL
                         Where StringHelpers.IsNullOrEmpty(x.ECNum)
                         Select x).Join(mapsSource).ToArray
             Dim net As FileStream.Network = BuildNET(rxns)

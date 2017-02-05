@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::41f6796cf5dd2886e95f3e84d064fcd0, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\Graph.vb"
+﻿#Region "Microsoft.VisualBasic::fd58888985c9a56c8dcb4bdc570aa777, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\Graph.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -31,6 +32,7 @@ Imports System.Xml.Serialization
 Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.Language
+Imports Microsoft.VisualBasic.Text
 
 Namespace CytoscapeGraphView.XGMML
 

@@ -1,27 +1,28 @@
-﻿#Region "Microsoft.VisualBasic::23ec4666642cca774eda3af0de3b9415, ..\interops\visualize\Cytoscape\Cytoscape\Cli\Cytoscape\CLI\KEGGPhenotypes.vb"
+﻿#Region "Microsoft.VisualBasic::7312f6615fca23295f97a8e71f2cdadf, ..\interops\visualize\Cytoscape\CLI_tool\CLI\KEGGPhenotypes.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
@@ -30,8 +31,8 @@ Imports Microsoft.VisualBasic.CommandLine
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.DataMining.KMeans
-Imports Microsoft.VisualBasic.DataVisualization.Network
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
+Imports Microsoft.VisualBasic.Data.visualize.Network
+Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports SMRUCC.genomics.Assembly.KEGG.Archives.Xml
@@ -57,6 +58,7 @@ Partial Module CLI
     <ExportAPI("/Phenotypes.KEGG",
                Info:="Regulator phenotype relationship cluster from virtual footprints.",
                Usage:="/Phenotypes.KEGG /mods <KEGG_Modules/Pathways.DIR> /in <VirtualFootprints.csv> [/pathway /out <outCluster.csv>]")>
+    <Group(CLIGrouping.KEGGPhenotype)>
     Public Function KEGGModulesPhenotypeRegulates(args As CommandLine) As Integer
         Dim inFile As String = args("/in")
         Dim modsDIR As String = args("/mods")
@@ -107,6 +109,7 @@ Partial Module CLI
     End Function
 
     <ExportAPI("/net.model", Usage:="/net.model /model <kegg.xmlModel.xml> [/out <outDIR> /not-trim]")>
+    <Group(CLIGrouping.KEGGPhenotype)>
     Public Function BuildModelNet(args As CommandLine) As Integer
         Dim model As String = args("/model")
         Dim out As String = args.GetValue("/out", model.TrimSuffix & ".NET/")
@@ -116,6 +119,7 @@ Partial Module CLI
     End Function
 
     <ExportAPI("/net.pathway", Usage:="/net.pathway /model <kegg.pathway.xml> [/out <outDIR> /trim]")>
+    <Group(CLIGrouping.KEGGPhenotype)>
     Public Function PathwayNet(args As CommandLine) As Integer
         Dim model As String = args("/model")
         Dim out As String = args.GetValue("/out", model.TrimSuffix & ".NET/")
@@ -131,6 +135,7 @@ Partial Module CLI
     ''' <returns></returns>
     <ExportAPI("/modNET.Simple",
                Usage:="/modNET.Simple /in <mods/pathway_DIR> [/out <outDIR> /pathway]")>
+    <Group(CLIGrouping.KEGGPhenotype)>
     Public Function SimpleModesNET(args As CommandLine) As Integer
         Dim inDIR As String = args("/in")
         Dim outDIR As String = args.GetValue("/out", inDIR & "-SimpleModsNET/")
@@ -151,7 +156,7 @@ Partial Module CLI
                     {"C", mods.GetC(x.x)}
                }
                Select New FileStream.Node With {
-                    .Identifier = x.EntryId,
+                    .ID = x.EntryId,
                     .NodeType = "Module",
                     .Properties = props
                }

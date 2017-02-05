@@ -1,38 +1,40 @@
-﻿#Region "Microsoft.VisualBasic::9cd0617cced34f6e4b643a5e3d5291f8, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\PfsNET\ModInteractions.vb"
+﻿#Region "Microsoft.VisualBasic::3e04b0b960df095ac6976fca0a5e783a, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\PfsNET\ModInteractions.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
-Imports SMRUCC.genomics.Assembly.KEGG.DBGET
-Imports Microsoft.VisualBasic.CommandLine.Reflection
-Imports Microsoft.VisualBasic.Scripting.MetaData
-Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream
-Imports Microsoft.VisualBasic.Linq
-Imports SMRUCC.genomics.ComponentModel
 Imports System.Runtime.CompilerServices
+Imports Microsoft.VisualBasic.CommandLine.Reflection
+Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream
+Imports Microsoft.VisualBasic.Linq
+Imports Microsoft.VisualBasic.Scripting.MetaData
+Imports Microsoft.VisualBasic.Text
+Imports SMRUCC.genomics.Assembly.KEGG.DBGET
 Imports SMRUCC.genomics.Assembly.KEGG.DBGET.BriteHEntry
+Imports SMRUCC.genomics.ComponentModel
 Imports SMRUCC.genomics.Model.Network.VirtualFootprint.DocumentFormat
 
 Namespace NetworkModel.KEGG
@@ -71,11 +73,11 @@ Namespace NetworkModel.KEGG
                             Select (From g As String
                                     In genes
                                     Select g,
-                                        __mod = x)).MatrixAsIterator
+                                        __mod = x)).IteratesALL
             net += (From x As T
                     In mods
                     Select New Node With {
-                        .Identifier = x.EntryId,
+                        .ID = x.EntryId,
                         .NodeType = modType,
                         .Properties = modHash.__modProperty(x)}).ToArray
             net += (From x In netEdges
@@ -86,7 +88,7 @@ Namespace NetworkModel.KEGG
                                                    .Confidence = 1,
                                                    .FromNode = edge.__mod.EntryId,
                                                    .ToNode = edge.g,
-                                                   .InteractionType = PathwayGene})).MatrixAsIterator
+                                                   .InteractionType = PathwayGene})).IteratesALL
             net += net.__modProperty(net.Edges)
 
             Return net
@@ -111,10 +113,10 @@ Namespace NetworkModel.KEGG
                               Not mX.Properties Is Nothing
                           Let props = New Dictionary(Of String, String)(mX.Properties)
                           Select New Node With {
-                              .Identifier = x.ToNode,
+                              .ID = x.ToNode,
                               .NodeType = "Enzyme",
                               .Properties = props})
-            Dim Groups = (From x In LQuery Select x Group x By x.Identifier Into Group)
+            Dim Groups = (From x In LQuery Select x Group x By x.ID Into Group)
             Return (From x In Groups Select x.Group.First)
         End Function
 
@@ -171,7 +173,7 @@ Namespace NetworkModel.KEGG
 
         Private Function __tfNode(TF As String) As Node
             Return New Node With {
-                .Identifier = TF,
+                .ID = TF,
                 .NodeType = "TF"
             }
         End Function
@@ -192,4 +194,3 @@ Namespace NetworkModel.KEGG
         End Function
     End Module
 End Namespace
-

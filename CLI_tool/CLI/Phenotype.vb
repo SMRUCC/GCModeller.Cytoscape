@@ -1,27 +1,28 @@
-﻿#Region "Microsoft.VisualBasic::9a5b3dc3943a2af6378c2f542cab37d7, ..\interops\visualize\Cytoscape\Cytoscape\Cli\Cytoscape\CLI\Phenotype.vb"
+﻿#Region "Microsoft.VisualBasic::719d165f968c9dc404f6d811a852fe9a, ..\interops\visualize\Cytoscape\CLI_tool\CLI\Phenotype.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
@@ -36,8 +37,8 @@ Imports Microsoft.VisualBasic.ComponentModel.DataStructures
 Imports Microsoft.VisualBasic.DataMining
 Imports Microsoft.VisualBasic.DataMining.KMeans
 Imports Microsoft.VisualBasic.DataMining.KMeans.CompleteLinkage
-Imports Microsoft.VisualBasic.DataVisualization.Network.FileStream
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
+Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream
+Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq
 Imports Microsoft.VisualBasic.Linq.Extensions
@@ -52,6 +53,7 @@ Imports SMRUCC.genomics.Interops.NBCR.MEME_Suite.Analysis.Similarity.TOMQuery
 Imports SMRUCC.genomics.Interops.NBCR.MEME_Suite.DocumentFormat.MEME
 Imports SMRUCC.genomics.Interops.NCBI.Extensions.LocalBLAST.Application.RpsBLAST
 Imports SMRUCC.genomics.Model.Network.Regulons.MotifCluster
+Imports Microsoft.VisualBasic.Text
 
 Partial Module CLI
 
@@ -73,7 +75,7 @@ Partial Module CLI
                     Select (From g As String   ' 有些基因是有多个COG值的，这个情况还不清楚如何处理
                             In x.locus
                             Select g,
-                                cogCat = x)).MatrixAsIterator.GroupBy(Function(x) x.g) _
+                                cogCat = x)).IteratesALL.GroupBy(Function(x) x.g) _
                                             .ToDictionary(Function(x) x.Key,
                                                           Function(x) x.First.cogCat)
 
@@ -84,8 +86,8 @@ Partial Module CLI
                 Continue For
             End If
 
-            If COGs.ContainsKey(node.Identifier) Then
-                Dim gene As COGFunc = COGs(node.Identifier)
+            If COGs.ContainsKey(node.ID) Then
+                Dim gene As COGFunc = COGs(node.ID)
                 Call node.Add("COG", gene.COG)
                 Call node.Add("Func", gene.Func)
                 Call node.Add("Category", gene.Category.Description)
@@ -96,19 +98,19 @@ Partial Module CLI
     End Function
 
     <ExportAPI("/Motif.Cluster", Usage:="/Motif.Cluster /query <meme.txt/MEME_OUT.DIR> /LDM <LDM-name/xml.path> [/clusters <3> /out <outCsv>]")>
-    <ParameterInfo("/clusters", True,
+    <Argument("/clusters", True,
                    Description:="If the expects clusters number is greater than the maps number, then the maps number divid 2 is used.")>
     Public Function MotifCluster(args As CommandLine) As Integer
         Dim query As String = args("/query")
         Dim name As String = args("/LDM")
-        Dim out As String = args.GetValue("/out", query.TrimSuffix & "." & IO.Path.GetFileNameWithoutExtension(name) & ".Csv")
+        Dim out As String = args.GetValue("/out", query.TrimSuffix & "." & basename(name) & ".Csv")
         Dim source As AnnotationModel()
 
         If query.FileExists Then
             source = AnnotationModel.LoadDocument(query)
         Else
             Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).MatrixToVector
+            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         End If
 
         If Not name.FileExists Then
@@ -166,7 +168,7 @@ Partial Module CLI
 
         Dim param As New Parameters
         Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-        Dim source As AnnotationModel() = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).MatrixToVector
+        Dim source As AnnotationModel() = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         Dim result As Dictionary(Of String, EntityLDM) =
             source.ToArray(Function(x) New EntityLDM With {.Name = x.Uid, .Properties = New Dictionary(Of String, Double)}) _
                   .ToDictionary(Function(x) x.Name)
@@ -185,7 +187,7 @@ Partial Module CLI
             End If
 
             Dim resultSet As List(Of EntityLDM) = __clusteringCommon(nClusters, Maps, Nothing)
-            Dim sId As String = IO.Path.GetFileNameWithoutExtension(xml)
+            Dim sId As String = basename(xml)
             Dim outFile As String = out & "/" & sId & ".Csv"
 
             Call resultSet.SaveTo(outFile)
@@ -230,13 +232,13 @@ Partial Module CLI
         Dim out As String = args.GetValue("/out", inDIR)
         Dim loads = (From file As String
                      In FileIO.FileSystem.GetFiles(inDIR, FileIO.SearchOption.SearchTopLevelOnly, "*.txt")
-                     Select AnnotationModel.LoadDocument(file)).MatrixToList
+                     Select AnnotationModel.LoadDocument(file)).Unlist
         Dim resultSet As EntityLDM() = __clusterFastCommon(loads, args("/ldm"))
         Dim QueryHash As Dictionary(Of AnnotationModel) = loads.ToDictionary
         '将Entity和sites位点联系起来
         Dim asso = (From x In resultSet Select x, sites = QueryHash(x.Name)).ToArray
-        Dim merges = (From gene In (From x In asso Select __expends(x.x, x.sites)).MatrixToList Select gene Group gene By gene.Name Into Group).ToArray
-        Dim result As EntityLDM() = merges.ToArray(Function(x) __merges(x.Group.ToArray), Parallel:=True)
+        Dim merges = (From gene In (From x In asso Select __expends(x.x, x.sites)).Unlist Select gene Group gene By gene.Name Into Group).ToArray
+        Dim result As EntityLDM() = merges.ToArray(Function(x) __merges(x.Group.ToArray), parallel:=True)
 
         Call result.SaveTo(out & "/resultSet.Csv")
 
@@ -307,7 +309,7 @@ Partial Module CLI
     ''' <param name="args">假若在最开始还没有赋值基因号，而是使用位置来代替的话，可以使用/map参数来讲基因从位置重新映射回基因编号</param>
     ''' <returns></returns>
     <ExportAPI("/Motif.Cluster.Fast"， Usage:="/Motif.Cluster.Fast /query <meme_OUT.DIR> [/LDM <ldm-DIR> /out <outDIR> /map <gb.gbk> /maxw -1 /ldm_loads]")>
-    <ParameterInfo("/maxw", True,
+    <Argument("/maxw", True,
                    Description:="If this parameter value is not set, then no motif in the query will be filterd, or all of the width greater then the width value will be removed.
                    If a filterd is necessary, value of 52 nt is recommended as the max width of the motif in the RegPrecise database is 52.")>
     Public Function FastCluster(args As CommandLine) As Integer
@@ -321,7 +323,7 @@ Partial Module CLI
             source = files.ToArray(Function(x) x.LoadXml(Of AnnotationModel))
         Else
             Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).MatrixToVector
+            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         End If
 
         If Not String.IsNullOrEmpty(args("/map")) Then
@@ -410,8 +412,8 @@ Partial Module CLI
                 Continue For
             End If
 
-            If DEGs.ContainsKey(node.Identifier) Then
-                Call node.Add("DEG", DEGs(node.Identifier))
+            If DEGs.ContainsKey(node.ID) Then
+                Call node.Add("DEG", DEGs(node.ID))
             End If
         Next
 
@@ -478,7 +480,7 @@ Partial Module CLI
     ''' <param name="mods"></param>
     ''' <returns></returns>
     Private Function __getMods(keys As String(), mods As bGetObject.Module(), cats As Dictionary(Of String, BriteHEntry.Module), ByRef modSum As Dictionary(Of String, Integer)) As String()
-        Dim LQuery = (From id As String In keys Select (From x In mods Where x.ContainsReaction(id) Select x)).MatrixAsIterator
+        Dim LQuery = (From id As String In keys Select (From x In mods Where x.ContainsReaction(id) Select x)).IteratesALL
         Dim mIds = (From x In LQuery Select x.BriteId Group By BriteId Into Count).ToArray
         Dim catQuery = (From x In mIds Select [mod] = cats(x.BriteId).SubCategory, x.Count Group By [mod] Into Group).ToArray
         Dim orders = (From x In catQuery
@@ -550,7 +552,7 @@ Partial Module CLI
                 Continue For
             End If
 
-            Dim mName As String = node.Identifier.Split("."c).First
+            Dim mName As String = node.ID.Split("."c).First
 
             Call node.Properties.Add(NameOf(mName), mName)
 
@@ -632,9 +634,9 @@ Partial Module CLI
             Dim mName As String
 
             If trim Then
-                mName = Regex.Match(node.Identifier, "[a-z]{1,3}\d+").Value
+                mName = Regex.Match(node.ID, "[a-z]{1,3}\d+").Value
             Else
-                mName = node.Identifier.Split("."c).First
+                mName = node.ID.Split("."c).First
             End If
 
             Call node.Properties.Add(NameOf(mName), mName)
@@ -691,9 +693,9 @@ Partial Module CLI
             Dim mName As String
 
             If trim Then
-                mName = Regex.Match(node.Identifier, "[a-z]+_M\d+", RegexOptions.IgnoreCase).Value
+                mName = Regex.Match(node.ID, "[a-z]+_M\d+", RegexOptions.IgnoreCase).Value
             Else
-                mName = node.Identifier.Split("."c).First
+                mName = node.ID.Split("."c).First
             End If
 
             Call node.Properties.Add(NameOf(mName), mName)
@@ -756,7 +758,7 @@ Partial Module CLI
                 Continue For
             End If
 
-            Dim mName As String = Regex.Replace(node.Identifier, "\.\d+", "")
+            Dim mName As String = Regex.Replace(node.ID, "\.\d+", "")
             Dim pair = mName.Split("."c)
             Dim locus As String = pair(Scan0)
 
@@ -795,7 +797,7 @@ Partial Module CLI
                             In FileIO.FileSystem.GetFiles(args("/familyinfo"), FileIO.SearchOption.SearchTopLevelOnly, "*.xml").AsParallel
                             Let regs = file.LoadXml(Of BacteriaGenome).Regulons
                             Where Not regs Is Nothing OrElse regs.Regulators.IsNullOrEmpty
-                            Select regs.Regulators).ToArray.MatrixToVector
+                            Select regs.Regulators).ToArray.ToVector
             FamilyHash = (From x As Regulator In regulons
                           Let uid As String = x.LocusId & "." & x.LocusTag.Value.Replace(":", "_")
                           Select x,
@@ -841,7 +843,7 @@ Partial Module CLI
                 Continue For
             End If
 
-            Dim bbh As String = Regex.Replace(node.Identifier, "\.\d+", "")
+            Dim bbh As String = Regex.Replace(node.ID, "\.\d+", "")
             Dim hit As String() = bbh.Split("."c)
 
             If hit.Length = 1 Then

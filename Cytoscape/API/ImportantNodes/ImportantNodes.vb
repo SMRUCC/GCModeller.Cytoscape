@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::746a2c84cfa8194fa5fcd2beaa93aa3a, ..\interops\visualize\Cytoscape\Cytoscape\API\ImportantNodes\ImportantNodes.vb"
+﻿#Region "Microsoft.VisualBasic::8164a5593fc2fb5086f6898e46c21b51, ..\interops\visualize\Cytoscape\Cytoscape\API\ImportantNodes\ImportantNodes.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -26,16 +27,16 @@
 #End Region
 
 Imports System.Runtime.CompilerServices
-Imports SMRUCC.genomics.Visualize.Cytoscape.Tables
-Imports SMRUCC.genomics.InteractionModel
-Imports SMRUCC.genomics.InteractionModel.Regulon
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CommandLine.Reflection
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
-Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.Reflection
+Imports Microsoft.VisualBasic.Data.csv
+Imports Microsoft.VisualBasic.Data.csv.StorageProvider.Reflection
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq
 Imports Microsoft.VisualBasic.Scripting.MetaData
+Imports SMRUCC.genomics.InteractionModel
+Imports SMRUCC.genomics.InteractionModel.Regulon
+Imports SMRUCC.genomics.Visualize.Cytoscape.Tables
 
 Namespace API.ImportantNodes
 
@@ -113,7 +114,7 @@ Namespace API.ImportantNodes
                                       .Regulators = (From rel As IRegulatorRegulation
                                                      In Regulations
                                                      Where Array.IndexOf(ranks.Nodes, rel.LocusId) > -1
-                                                     Select rel.Regulators).MatrixAsIterator.Distinct.ToArray,
+                                                     Select rel.Regulators).IteratesALL.Distinct.ToArray,
                                       .GeneCluster = ranks.Nodes}).ToArray
             Return RegulatorRanks
         End Function
@@ -201,7 +202,7 @@ Namespace API.ImportantNodes
                               In S.AsParallel
                               Where NDS.IndexOf(b) > -1
                               Let ia = (From a As Node In NDS Where a < b Select a).ToArray
-                              Select ia).MatrixToVector
+                              Select ia).ToVector
                 NDS = (From node As Node
                        In NDS.AsParallel
                        Where Array.IndexOf(LQuery, node) = -1
