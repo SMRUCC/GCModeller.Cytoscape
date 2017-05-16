@@ -1,34 +1,35 @@
-﻿#Region "Microsoft.VisualBasic::60b6806e2ab4b9d3c749bcfa0aedabed, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\Pathways.vb"
+﻿#Region "Microsoft.VisualBasic::62ddc43d12bc85baf622d77b1eff20b5, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\Pathways.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
-Imports Microsoft.VisualBasic.DataVisualization.Network
-Imports Microsoft.VisualBasic.DocumentFormat.Csv.Extensions
+Imports Microsoft.VisualBasic.Data.visualize.Network
+Imports Microsoft.VisualBasic.Data.csv.Extensions
 Imports Microsoft.VisualBasic.Language
 Imports SMRUCC.genomics.Assembly
 Imports SMRUCC.genomics.Assembly.MetaCyc.File.DataFiles.Slots
@@ -87,7 +88,7 @@ Namespace NetworkModel
                                In Pwy.InPathway
                                Select New FileStream.NetworkEdge With {
                                    .FromNode = Id.ToUpper,
-                                   .InteractionType = "Contains",
+                                   .Interaction = "Contains",
                                    .ToNode = Pwy.Identifier
                                }
                 End If
@@ -114,9 +115,9 @@ Namespace NetworkModel
             Nodes = NodeList.ToArray
         End Sub
 
-        Public Class Pathway : Implements sIdEnumerable
+        Public Class Pathway : Implements INamedValue
 
-            Public Property Identifier As String Implements sIdEnumerable.Identifier
+            Public Property Identifier As String Implements INamedValue.Key
             Public Property ReactionCounts As Integer
             Public Property EnzymeCounts As Integer
             Public Property CommonName As String
@@ -139,7 +140,7 @@ Namespace NetworkModel
                                   item.LinkType.ToString)
                             Select New FileStream.NetworkEdge With {
                                 .FromNode = UniqueId,
-                                .InteractionType = iter,
+                                .Interaction = iter,
                                 .ToNode = item.Id.Replace("|", "").ToUpper
                             }
             Next

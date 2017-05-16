@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::746a2c84cfa8194fa5fcd2beaa93aa3a, ..\interops\visualize\Cytoscape\Cytoscape\API\ImportantNodes\ImportantNodes.vb"
+﻿#Region "Microsoft.VisualBasic::8164a5593fc2fb5086f6898e46c21b51, ..\interops\visualize\Cytoscape\Cytoscape\API\ImportantNodes\ImportantNodes.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -26,16 +27,16 @@
 #End Region
 
 Imports System.Runtime.CompilerServices
-Imports SMRUCC.genomics.Visualize.Cytoscape.Tables
-Imports SMRUCC.genomics.InteractionModel
-Imports SMRUCC.genomics.InteractionModel.Regulon
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CommandLine.Reflection
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
-Imports Microsoft.VisualBasic.DocumentFormat.Csv.StorageProvider.Reflection
+Imports Microsoft.VisualBasic.Data.csv
+Imports Microsoft.VisualBasic.Data.csv.StorageProvider.Reflection
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq
 Imports Microsoft.VisualBasic.Scripting.MetaData
+Imports SMRUCC.genomics.InteractionModel
+Imports SMRUCC.genomics.InteractionModel.Regulon
+Imports SMRUCC.genomics.Visualize.Cytoscape.Tables
 
 Namespace API.ImportantNodes
 
@@ -113,7 +114,7 @@ Namespace API.ImportantNodes
                                       .Regulators = (From rel As IRegulatorRegulation
                                                      In Regulations
                                                      Where Array.IndexOf(ranks.Nodes, rel.LocusId) > -1
-                                                     Select rel.Regulators).MatrixAsIterator.Distinct.ToArray,
+                                                     Select rel.Regulators).IteratesALL.Distinct.ToArray,
                                       .GeneCluster = ranks.Nodes}).ToArray
             Return RegulatorRanks
         End Function
@@ -163,9 +164,9 @@ Namespace API.ImportantNodes
         <ExportAPI("evaluate.importance",
                    Info:="If fast parameter is set to true, then a parallel edition of the algorithm will implemented for accelerates the network calculation.")>
         Public Function EquivalenceClass(S As Node(), Optional Fast As Boolean = False) As KeyValuePair(Of Integer, Node())()
-            If Fast Then Return __equivalenceFast(S.ToList, S)
+            If Fast Then Return __equivalenceFast(S.AsList, S)
 
-            Dim NDS As List(Of Node) = S.ToList
+            Dim NDS As List(Of Node) = S.AsList
             Dim Extra As List(Of Node) = New List(Of Node)
             Dim Rank As Integer = 0
             Dim SortResult As List(Of KeyValuePair(Of Integer, Node())) = New List(Of KeyValuePair(Of Integer, Node()))
@@ -185,7 +186,7 @@ Namespace API.ImportantNodes
                 Rank += 1
                 Call SortResult.Add(New KeyValuePair(Of Integer, Node())(Rank, NDS.ToArray))
                 Call Console.WriteLine("Rank:= {0};  ImportantNodes:= {1}", SortResult.Last.Key, String.Join("; ", (From item In SortResult.Last.Value Select item.SharedName).ToArray))
-                NDS = Extra.Distinct.ToList
+                NDS = Extra.Distinct.AsList
                 Call Extra.Clear()
             Loop
 
@@ -201,19 +202,19 @@ Namespace API.ImportantNodes
                               In S.AsParallel
                               Where NDS.IndexOf(b) > -1
                               Let ia = (From a As Node In NDS Where a < b Select a).ToArray
-                              Select ia).MatrixToVector
+                              Select ia).ToVector
                 NDS = (From node As Node
                        In NDS.AsParallel
                        Where Array.IndexOf(LQuery, node) = -1
                        Select node
-                       Distinct).ToList
+                       Distinct).AsList
                 Rank += 1
                 If NDS.IsNullOrEmpty Then
                     Exit Do
                 End If
                 Call SortResult.Add(New KeyValuePair(Of Integer, Node())(Rank, NDS.ToArray))
                 Call Console.WriteLine("Rank:= {0};  ImportantNodes:= {1}", SortResult.Last.Key, String.Join("; ", (From item In SortResult.Last.Value Select item.SharedName).ToArray))
-                NDS = LQuery.Distinct.ToList
+                NDS = LQuery.Distinct.AsList
             Loop
 
             Return SortResult.ToArray

@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::23ec4666642cca774eda3af0de3b9415, ..\interops\visualize\Cytoscape\Cytoscape\Cli\Cytoscape\CLI\KEGGPhenotypes.vb"
+﻿#Region "Microsoft.VisualBasic::7312f6615fca23295f97a8e71f2cdadf, ..\interops\visualize\Cytoscape\CLI_tool\CLI\KEGGPhenotypes.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -26,11 +27,12 @@
 #End Region
 
 Imports System.Runtime.CompilerServices
+Imports Microsoft.VisualBasic.CommandLine
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.ComponentModel
-Imports Microsoft.VisualBasic.DataMining.Framework.KMeans
-Imports Microsoft.VisualBasic.DataVisualization.Network
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
+Imports Microsoft.VisualBasic.DataMining.KMeans
+Imports Microsoft.VisualBasic.Data.visualize.Network
+Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports SMRUCC.genomics.Assembly.KEGG.Archives.Xml
@@ -56,11 +58,12 @@ Partial Module CLI
     <ExportAPI("/Phenotypes.KEGG",
                Info:="Regulator phenotype relationship cluster from virtual footprints.",
                Usage:="/Phenotypes.KEGG /mods <KEGG_Modules/Pathways.DIR> /in <VirtualFootprints.csv> [/pathway /out <outCluster.csv>]")>
-    Public Function KEGGModulesPhenotypeRegulates(args As CommandLine.CommandLine) As Integer
+    <Group(CLIGrouping.KEGGPhenotype)>
+    Public Function KEGGModulesPhenotypeRegulates(args As CommandLine) As Integer
         Dim inFile As String = args("/in")
         Dim modsDIR As String = args("/mods")
         Dim isPathway As Boolean = args.GetBoolean("/pathway")
-        Dim out As String = args.GetValue("/out", inFile.TrimFileExt & ".PhenotypeRegulates.Csv")
+        Dim out As String = args.GetValue("/out", inFile.TrimSuffix & ".PhenotypeRegulates.Csv")
         Dim footprints As PredictedRegulationFootprint() =
             inFile.LoadCsv(Of PredictedRegulationFootprint).__distinctCommon
         Dim loadMods As ModuleClassAPI =
@@ -98,7 +101,7 @@ Partial Module CLI
                                                   Function(prop) prop.Value.Value / l)
         })
 
-        Call sets.SaveTo(out.TrimFileExt & ".resultSet.Csv")
+        Call sets.SaveTo(out.TrimSuffix & ".resultSet.Csv")
 
         ' 树形聚类
         Dim saveResult = sets.TreeCluster
@@ -106,18 +109,20 @@ Partial Module CLI
     End Function
 
     <ExportAPI("/net.model", Usage:="/net.model /model <kegg.xmlModel.xml> [/out <outDIR> /not-trim]")>
-    Public Function BuildModelNet(args As CommandLine.CommandLine) As Integer
+    <Group(CLIGrouping.KEGGPhenotype)>
+    Public Function BuildModelNet(args As CommandLine) As Integer
         Dim model As String = args("/model")
-        Dim out As String = args.GetValue("/out", model.TrimFileExt & ".NET/")
+        Dim out As String = args.GetValue("/out", model.TrimSuffix & ".NET/")
         Dim bmods As XmlModel = model.LoadXml(Of XmlModel)
         Dim notTrim As Boolean = args.GetBoolean("/not-trim")
         Return ExportPathwayGraphFile(bmods, out, notTrim).CLICode
     End Function
 
     <ExportAPI("/net.pathway", Usage:="/net.pathway /model <kegg.pathway.xml> [/out <outDIR> /trim]")>
-    Public Function PathwayNet(args As CommandLine.CommandLine) As Integer
+    <Group(CLIGrouping.KEGGPhenotype)>
+    Public Function PathwayNet(args As CommandLine) As Integer
         Dim model As String = args("/model")
-        Dim out As String = args.GetValue("/out", model.TrimFileExt & ".NET/")
+        Dim out As String = args.GetValue("/out", model.TrimSuffix & ".NET/")
         Dim bmods As XmlModel = model.LoadXml(Of XmlModel)
         Dim trim As Boolean = args.GetBoolean("/trim")
         Return ExportPathwayGraphFile(bmods, out, trim).CLICode
@@ -130,7 +135,8 @@ Partial Module CLI
     ''' <returns></returns>
     <ExportAPI("/modNET.Simple",
                Usage:="/modNET.Simple /in <mods/pathway_DIR> [/out <outDIR> /pathway]")>
-    Public Function SimpleModesNET(args As CommandLine.CommandLine) As Integer
+    <Group(CLIGrouping.KEGGPhenotype)>
+    Public Function SimpleModesNET(args As CommandLine) As Integer
         Dim inDIR As String = args("/in")
         Dim outDIR As String = args.GetValue("/out", inDIR & "-SimpleModsNET/")
         Dim mods = If(args.GetBoolean("/pathway"),
@@ -150,7 +156,7 @@ Partial Module CLI
                     {"C", mods.GetC(x.x)}
                }
                Select New FileStream.Node With {
-                    .Identifier = x.EntryId,
+                    .ID = x.EntryId,
                     .NodeType = "Module",
                     .Properties = props
                }
@@ -161,10 +167,10 @@ Partial Module CLI
 
                 If Not common.IsNullOrEmpty Then
                     net += New FileStream.NetworkEdge With {
-                        .Confidence = common.Length,
+                        .value = common.Length,
                         .FromNode = a.EntryId,
                         .ToNode = b.EntryId,
-                        .InteractionType = "Interact",
+                        .Interaction = "Interact",
                         .Properties = New Dictionary(Of String, String) From {
                             {"Genes", common.JoinBy("; ")}
                         }

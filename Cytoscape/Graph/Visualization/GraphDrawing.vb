@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::0a2c6507e51b695c9c67d2652d53ebaa, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Visualization\GraphDrawing.vb"
+﻿#Region "Microsoft.VisualBasic::87272cfabbe5e08d91498e428facfa4b, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Visualization\GraphDrawing.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -27,9 +28,9 @@
 
 Imports System.Drawing
 Imports System.Runtime.CompilerServices
-Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
-Imports SMRUCC.genomics.Assembly.KEGG.DBGET.ReferenceMap
 Imports Microsoft.VisualBasic.Imaging
+Imports SMRUCC.genomics.Assembly.KEGG.DBGET.ReferenceMap
+Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
 
 Namespace CytoscapeGraphView
 
@@ -70,14 +71,6 @@ Namespace CytoscapeGraphView
             Dim yScale As Double = (size.Height / grSize.Height) * graph.Graphics.ScaleFactor
 
             Using GrDevice As Drawing.Graphics = Drawing.Graphics.FromImage(Bitmap)
-                GrDevice.CompositingQuality = Drawing2D.CompositingQuality.HighQuality
-                GrDevice.CompositingMode = Drawing2D.CompositingMode.SourceOver
-                GrDevice.InterpolationMode = Drawing2D.InterpolationMode.HighQualityBicubic
-                GrDevice.PixelOffsetMode = Drawing2D.PixelOffsetMode.HighQuality
-                GrDevice.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
-                GrDevice.TextRenderingHint = Text.TextRenderingHint.ClearTypeGridFit
-                ' GrDevice.PageScale = 2
-
                 Call GrDevice.FillRectangle(Brushes.White, New Rectangle(New Point, size))
 
                 Dim Nodes = graph.Nodes.ToDictionary(Function(n) n.id,
@@ -164,7 +157,7 @@ Namespace CytoscapeGraphView
                 Graph.GetSize(Scale),
                 New Size(Val(Size.Split(CChar(",")).First), Val(Size.Split(CChar(",")).Last)))
 
-            Using gdi As GDIPlusDeviceHandle = _size.CreateGDIDevice
+            Using gdi As Graphics2D = _size.CreateGDIDevice
                 Dim offset As Point = New Point(30, 35)
 
                 Call Size.__DEBUG_ECHO
@@ -181,7 +174,7 @@ Namespace CytoscapeGraphView
 
                 For Each Node In Graph.Nodes
                     Dim Orthology = refMap.GetReaction(Node("KEGG_ENTRY").Value).SSDBs
-                    Dim KO_sp As String() = (From Entry In (From ort In Orthology Select ort.Value).ToArray.MatrixToList Select Entry.SpeciesId Distinct).ToArray
+                    Dim KO_sp As String() = (From Entry In (From ort In Orthology Select ort.Value).ToArray.Unlist Select Entry.SpeciesId Distinct).ToArray
                     Dim ColorList = (From sp As String In KO_sp Where Colors.ContainsKey(sp) Select sp, sp_Color = Colors(sp)).ToArray
                     Dim Color As Color
 

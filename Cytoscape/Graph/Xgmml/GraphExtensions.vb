@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::ae2ee67d72e55ba323da60276baddf4e, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\GraphExtensions.vb"
+﻿#Region "Microsoft.VisualBasic::7bda6f019a6cde182b0596e607919b59, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\GraphExtensions.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -42,7 +43,7 @@ Namespace CytoscapeGraphView.XGMML
                          Group edge By edge.__internalUID Into Group
             Dim buf As Edge() = LQuery.Select(Function(x) x.Group) _
                 .ToArray(AddressOf MergeEdges, Parallel:=True) _
-                .AddHandle.ToArray
+                .WriteAddress.ToArray
             Return buf
         End Function
 

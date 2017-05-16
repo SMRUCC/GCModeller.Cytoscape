@@ -1,27 +1,28 @@
-﻿#Region "Microsoft.VisualBasic::1becec9b5e9dc83934641f1dcddcff88, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\PINetwork.vb"
+﻿#Region "Microsoft.VisualBasic::f8bdc437d6031b6a90fb4bf8012595ef, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\PINetwork.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
@@ -34,7 +35,9 @@ Imports Microsoft.VisualBasic.Scripting.MetaData
 Imports SMRUCC.genomics.Assembly.NCBI.GenBank.TabularFormat
 Imports SMRUCC.genomics.Assembly.NCBI.GenBank.TabularFormat.ComponentModels
 Imports SMRUCC.genomics.ComponentModel.Loci
-Imports SMRUCC.genomics.Data.StringDB
+Imports SMRUCC.genomics.Model
+Imports SMRUCC.genomics.foundation
+Imports SMRUCC.genomics.foundation.psidev.XML
 Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView
 Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
 
@@ -62,13 +65,13 @@ Namespace NetworkModel.StringDB
                            In PTT.GeneObjects.AsParallel
                            Select New XGMML.Node With {
                                .label = GeneObject.Synonym,
-                               .Attributes = __attributes(GeneObject)}).AddHandle '使用PTT文件首先生成节点
+                               .Attributes = __attributes(GeneObject)}).WriteAddress '使用PTT文件首先生成节点
 
             Dim Network As New List(Of Edge)
 
             For Each iteraction In stringDB.LoadSourceEntryList({"*.xml"})      ' string-db数据库是用来生成网络之中的边的
-                For Each itr As MIF25.Nodes.Entry In iteraction.Value.LoadXml(Of MIF25.EntrySet).Entries
-                    Network += From edge As MIF25.Nodes.Interaction
+                For Each itr As psidev.XML.Entry In iteraction.Value.LoadXml(Of EntrySet).Entries
+                    Network += From edge As psidev.XML.Interaction
                                In itr.InteractionList
                                Let edgeModel = __edgeModel(edge, Model, itr)
                                Let conf = Val(edgeModel.Value("ConfidenceList-likelihood")?.Value)
@@ -78,7 +81,7 @@ Namespace NetworkModel.StringDB
                 Call Console.Write(".")
             Next
 
-            Model.Edges = Network.AddHandle
+            Model.Edges = Network.WriteAddress
 
             Dim nodes = Model.Nodes.ToDictionary(Function(obj) obj.id,
                                                  Function(obj) New Value(Of Integer)(0))
@@ -115,7 +118,7 @@ Namespace NetworkModel.StringDB
             Return Model
         End Function
 
-        Private Function __edgeModel(edge As MIF25.Nodes.Interaction, Model As Graph, itr As MIF25.Nodes.Entry) As Edge
+        Private Function __edgeModel(edge As psidev.XML.Interaction, Model As Graph, itr As Entry) As Edge
             Dim EdgeModel As Edge = New Edge
             Dim source As String = itr.GetInteractor(edge.ParticipantList.First.InteractorRef).Synonym
             Dim target As String = itr.GetInteractor(edge.ParticipantList.Last.InteractorRef).Synonym
@@ -127,7 +130,7 @@ Namespace NetworkModel.StringDB
             Dim attrs As New List(Of Attribute)
             attrs += New Attribute With {
                 .Type = ATTR_VALUE_TYPE_REAL,
-                .Name = $"{NameOf(edge.ConfidenceList)}-{edge.ConfidenceList.First.Unit.Names.ShortLabel}",
+                .Name = $"{NameOf(edge.ConfidenceList)}-{edge.ConfidenceList.First.Unit.Names.shortLabel}",
                 .Value = edge.ConfidenceList.First.value
             }
 
@@ -136,13 +139,13 @@ Namespace NetworkModel.StringDB
             If Not experiment Is Nothing Then
                 Dim name As String =
                     If(experiment.Names Is Nothing,
-                    experiment.interactionDetectionMethod.Names.ShortLabel,
-                    experiment.Names.ShortLabel)
+                    experiment.interactionDetectionMethod.Names.shortLabel,
+                    experiment.Names.shortLabel)
 
                 attrs += New Attribute With {
                     .Type = ATTR_VALUE_TYPE_STRING,
                     .Name = $"{NameOf(edge.ExperimentList)}-{name}",
-                    .Value = experiment.Bibref.Xref.PrimaryReference.Db & ": " & experiment.Bibref.Xref.PrimaryReference.Id
+                    .Value = experiment.Bibref.Xref.primaryRef.db & ": " & experiment.Bibref.Xref.primaryRef.id
                 }
             End If
 

@@ -1,27 +1,28 @@
-﻿#Region "Microsoft.VisualBasic::c052414f8d44c35ea0c9062a0fc7d8ed, ..\interops\visualize\Cytoscape\Cytoscape.App\ShellScriptAPI.vb"
+﻿#Region "Microsoft.VisualBasic::7ce41832629ba0e843212d32832391e7, ..\interops\visualize\Cytoscape\Cytoscape.App\ShellScriptAPI.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
@@ -125,7 +126,7 @@ Public Module ShellScriptAPI
                                 Select ID = String.Format("[{0}] {1}", xId, refRxn.Entry),
                                     DataModel = refRxn.ReactionModel,
                                     refRxnX = refRxn,
-                                    EcNum = xId)).MatrixAsIterator
+                                    EcNum = xId)).IteratesALL
 
         Dim Graph As Graph = Graph.CreateObject(RefMap.Name.Replace("<br>", ""), "KEGG reference map data", RefMap.Description.Replace("<br>", ""))
         Graph.ID = RefMap.EntryId
@@ -161,19 +162,19 @@ Public Module ShellScriptAPI
                        Select New XGMML.Node With {
                            .label = rxn.ID,
                            .Attributes = InternalAttr
-                           }).ToArray.AddHandle
+                           }).ToArray.WriteAddress
 
         Graph.Edges = (From rxn In Reaction
                        Let Edges = (From target In Reaction
                                     Let Compound As String() = (From source In rxn.DataModel.Products
-                                                                Where target.DataModel.GetCoEfficient(source.Identifier) < 0
-                                                                Select source.Identifier).ToArray
+                                                                Where target.DataModel.GetCoEfficient(source.ID) < 0
+                                                                Select source.ID).ToArray
                                     Where Not Compound.IsNullOrEmpty
                                     Select New XGMML.Edge With {
                                         .source = Graph.GetNode(rxn.ID).id,
                                         .target = Graph.GetNode(target.ID).id,
                                         .Label = Compound.First}).ToArray
-                       Select Edges).ToArray.MatrixToVector.AddHandle '从rxn的右边到target的左边形成一条边
+                       Select Edges).ToArray.ToVector.WriteAddress '从rxn的右边到target的左边形成一条边
         Return Graph
     End Function
 
@@ -183,4 +184,3 @@ Public Module ShellScriptAPI
         Return GraphDrawing.InvokeDrawing(graph, refMap, Mapping, size)
     End Function
 End Module
-

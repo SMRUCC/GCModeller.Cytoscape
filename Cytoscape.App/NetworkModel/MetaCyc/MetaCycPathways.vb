@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::f611840520d0bdaf860deb140f20c35a, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\MetaCycPathways.vb"
+﻿#Region "Microsoft.VisualBasic::911cabfaaa4b4d29f3f61ee215b781ec, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\MetaCycPathways.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -27,14 +28,14 @@
 
 Imports System.Text
 Imports System.Xml.Serialization
+Imports Microsoft.VisualBasic
+Imports Microsoft.VisualBasic.ComponentModel
+Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
+Imports Microsoft.VisualBasic.Data.csv
+Imports Microsoft.VisualBasic.Language
 Imports SMRUCC.genomics.Assembly
 Imports SMRUCC.genomics.Assembly.MetaCyc.File.DataFiles
 Imports SMRUCC.genomics.Assembly.MetaCyc.File.FileSystem
-Imports Microsoft.VisualBasic.ComponentModel
-Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
-Imports Microsoft.VisualBasic.DocumentFormat.Csv
-Imports Microsoft.VisualBasic
-Imports Microsoft.VisualBasic.Language
 
 ''' <summary>
 ''' 整理出代谢途径和相应的基因，对于基因个数少于5的代谢途径，其被合并至其他较大的SuperPathway之中去
@@ -97,9 +98,9 @@ Public Class MetaCycPathways
         Return pathway
     End Function
 
-    <XmlType("pwy")> Public Class Pathway : Implements sIdEnumerable
+    <XmlType("pwy")> Public Class Pathway : Implements INamedValue
         Public Property MetaCycBaseType As Slots.Pathway
-        Public Property Identifier As String Implements sIdEnumerable.Identifier
+        Public Property Identifier As String Implements INamedValue.Key
         ''' <summary> 
         ''' 本代谢途径是否为一个超途径
         ''' </summary>
@@ -140,12 +141,12 @@ Public Class MetaCycPathways
         End Function
     End Class
 
-    Public Shared Function GenerateReport(Pathways As Pathway(), Genes As Genes) As DocumentStream.File
-        Dim File As DocumentStream.File = New DocumentStream.File
+    Public Shared Function GenerateReport(Pathways As Pathway(), Genes As Genes) As IO.File
+        Dim File As IO.File = New IO.File
         Dim sBuilder As StringBuilder = New StringBuilder(1024)
         File.AppendLine(New String() {"UniqueId", "Description", "Is_Super_Pathway?", "Associated_gene_counts", "Associated_gene_list"})
         For Each pwy In Pathways
-            Dim row As DocumentStream.RowObject = New DocumentStream.RowObject
+            Dim row As IO.RowObject = New IO.RowObject
             Call row.AddRange(New String() {pwy.Identifier, pwy.MetaCycBaseType.CommonName, pwy.SuperPathway})
             Dim GeneCollection = (From gene In Genes.Takes(pwy.AssociatedGenes) Select gene.Accession1).ToArray  '
             Call row.Add(GeneCollection.Count)
@@ -160,7 +161,7 @@ Public Class MetaCycPathways
         Return File
     End Function
 
-    Public Shared Function CreateGeneCollection(Pathways As Pathway(), Genes As Genes, ProteinDomains As DocumentStream.File) As DocumentStream.File
+    Public Shared Function CreateGeneCollection(Pathways As Pathway(), Genes As Genes, ProteinDomains As IO.File) As IO.File
         Dim List As List(Of String) = New List(Of String)
 
         For Each pwy In Pathways
@@ -169,7 +170,7 @@ Public Class MetaCycPathways
                     Select gene.Accession1
         Next
 
-        Dim File As New DocumentStream.File
+        Dim File As New IO.File
         Call File.AppendLine(New String() {"AccessionId", "Common_name", "Description", "Pfam_domains", "Sequence"})
         For Each Id As String In List.Distinct
             Call File.AppendLine(ProteinDomains.FindAtColumn(KeyWord:=Id, Column:=0).First)
@@ -177,4 +178,3 @@ Public Class MetaCycPathways
         Return File
     End Function
 End Class
-

@@ -1,9 +1,10 @@
-﻿#Region "Microsoft.VisualBasic::5c8fb2ee8ebd3c5a8ceff97b626271bb, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\Attributes.vb"
+﻿#Region "Microsoft.VisualBasic::8bee24c0f89be09bd675551a6d6e0559, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Xgmml\Attributes.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
     '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
     ' 
     ' Copyright (c) 2016 GPL3 Licensed
     ' 
@@ -29,7 +30,6 @@ Imports System.Drawing
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
-Imports Microsoft.VisualBasic.DocumentFormat.RDF
 Imports Microsoft.VisualBasic.Language
 
 Namespace CytoscapeGraphView.XGMML
@@ -39,9 +39,9 @@ Namespace CytoscapeGraphView.XGMML
     ''' </summary>
     ''' <remarks></remarks>
     <XmlType("att")>
-    Public Class Attribute : Implements sIdEnumerable
+    Public Class Attribute : Implements INamedValue
 
-        <XmlAttribute("name")> Public Property Name As String Implements sIdEnumerable.Identifier
+        <XmlAttribute("name")> Public Property Name As String Implements INamedValue.Key
         <XmlAttribute("value")> Public Property Value As String
         <XmlAttribute("type")> Public Property Type As String
 

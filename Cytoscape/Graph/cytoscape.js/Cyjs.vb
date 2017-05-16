@@ -1,37 +1,39 @@
-﻿#Region "Microsoft.VisualBasic::c809b021d3dba2c835390ad861dc9515, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Cyjs.vb"
+﻿#Region "Microsoft.VisualBasic::4c62b148d67950d545f0fef8b5d932e4, ..\interops\visualize\Cytoscape\Cytoscape\Graph\Cyjs.vb"
 
-' Author:
-' 
-'       asuka (amethyst.asuka@gcmodeller.org)
-'       xieguigang (xie.guigang@live.com)
-' 
-' Copyright (c) 2016 GPL3 Licensed
-' 
-' 
-' GNU GENERAL PUBLIC LICENSE (GPL3)
-' 
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-' 
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-' 
-' You should have received a copy of the GNU General Public License
-' along with this program. If not, see <http://www.gnu.org/licenses/>.
+    ' Author:
+    ' 
+    '       asuka (amethyst.asuka@gcmodeller.org)
+    '       xieguigang (xie.guigang@live.com)
+    '       xie (genetics@smrucc.org)
+    ' 
+    ' Copyright (c) 2016 GPL3 Licensed
+    ' 
+    ' 
+    ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
+    ' This program is free software: you can redistribute it and/or modify
+    ' it under the terms of the GNU General Public License as published by
+    ' the Free Software Foundation, either version 3 of the License, or
+    ' (at your option) any later version.
+    ' 
+    ' This program is distributed in the hope that it will be useful,
+    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
+    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    ' GNU General Public License for more details.
+    ' 
+    ' You should have received a copy of the GNU General Public License
+    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #End Region
 
 Imports System.Text
 Imports System.Web.Script.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
-Imports Microsoft.VisualBasic.DataVisualization.Network.Abstract
-Imports Microsoft.VisualBasic.DataVisualization.Network.Graph
+Imports Microsoft.VisualBasic.Data.visualize.Network.Graph.Abstract
+Imports Microsoft.VisualBasic.Data.visualize.Network.Graph
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports Microsoft.VisualBasic.Serialization.JSON
+Imports Microsoft.VisualBasic.Text
 Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
 
 Namespace CytoscapeGraphView.Cyjs
@@ -95,7 +97,7 @@ Namespace CytoscapeGraphView.Cyjs
         End Function
 
         Public Function Save(Optional Path As String = "", Optional encoding As Encodings = Encodings.UTF8) As Boolean Implements ISaveHandle.Save
-            Return Save(Path, encoding.GetEncodings)
+            Return Save(Path, encoding.CodePage)
         End Function
     End Class
 
@@ -148,9 +150,9 @@ Namespace CytoscapeGraphView.Cyjs
 
         Public Property source As String Implements IInteraction.source
         Public Property target As String Implements IInteraction.target
-        Public Property Confidence As Double Implements INetworkEdge.Confidence
+        Public Property Confidence As Double Implements INetworkEdge.value
         Public Property EdgeBetweenness As Double
-        Public Property interaction As String Implements INetworkEdge.InteractionType
+        Public Property interaction As String Implements INetworkEdge.Interaction
         Public Property shared_interaction As String
         Public Property SelfLoop As Boolean
     End Class
@@ -183,7 +185,7 @@ Namespace CytoscapeGraphView.Cyjs
         Public Property ClusteringCoefficient As Double
         Public Property Size As Integer
 
-        Public Property Identifer As String Implements INode.Identifier
+        Public Property Identifer As String Implements INode.ID
             Get
                 Return name
             End Get
