@@ -30,6 +30,7 @@ Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.CommandLine
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.ComponentModel
+Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.ComponentModel.DataStructures
 Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream
@@ -99,14 +100,14 @@ Partial Module CLI
     Public Function MotifCluster(args As CommandLine) As Integer
         Dim query As String = args("/query")
         Dim name As String = args("/LDM")
-        Dim out As String = args.GetValue("/out", query.TrimSuffix & "." & basename(name) & ".Csv")
+        Dim out As String = args.GetValue("/out", query.TrimSuffix & "." & BaseName(name) & ".Csv")
         Dim source As AnnotationModel()
 
         If query.FileExists Then
             source = AnnotationModel.LoadDocument(query)
         Else
             Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
+            source = files.Select(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         End If
 
         If Not name.FileExists Then
@@ -135,9 +136,9 @@ Partial Module CLI
             Dim array As EntityLDM()
 
             If mapNames Is Nothing Then
-                array = cluster.ToArray(Function(x) setValue(x.ToLDM, CStr(i)))
+                array = cluster.Select(Function(x) setValue(x.ToLDM, CStr(i)))
             Else
-                array = cluster.ToArray(Function(x) setValue(x.ToLDM(mapNames), CStr(i)))
+                array = cluster.Select(Function(x) setValue(x.ToLDM(mapNames), CStr(i)))
             End If
 
             i += 1
@@ -165,10 +166,15 @@ Partial Module CLI
 
         Dim param As New Parameters
         Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-        Dim source As AnnotationModel() = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
+        Dim source As AnnotationModel() = files.Select(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         Dim result As Dictionary(Of String, EntityLDM) =
-            source.ToArray(Function(x) New EntityLDM With {.Name = x.Uid, .Properties = New Dictionary(Of String, Double)}) _
-                  .ToDictionary(Function(x) x.Name)
+            source.Select(Function(x)
+                               Return New EntityLDM With {
+                                   .ID = x.Uid,
+                                   .Properties = New Dictionary(Of String, Double)
+                               }
+                           End Function) _
+                  .ToDictionary(Function(x) x.ID)
 
         If nClusters >= source.Length Then
             nClusters = source.Length / 2
@@ -184,17 +190,17 @@ Partial Module CLI
             End If
 
             Dim resultSet As List(Of EntityLDM) = __clusteringCommon(nClusters, Maps, Nothing)
-            Dim sId As String = basename(xml)
+            Dim sId As String = BaseName(xml)
             Dim outFile As String = out & "/" & sId & ".Csv"
 
             Call resultSet.SaveTo(outFile)
 
             For Each map As EntityLDM In resultSet
-                result(map.Name).Properties(sId) = map.Cluster
+                result(map.ID).Properties(sId) = map.Cluster
             Next
 
             Dim all As [Set] = New [Set](result.Keys)
-            Dim mapSet As [Set] = New [Set](resultSet.ToArray(Function(x) x.Name))
+            Dim mapSet As [Set] = New [Set](resultSet.Select(Function(x) x.ID))
             Dim delta = all - mapSet
 
             For Each unMap As String In delta.ToArray(Of String)
@@ -205,16 +211,16 @@ Partial Module CLI
         Next
 
         Dim mapNames = result.First.Value.Properties.Keys.ToArray
-        Dim datas = result.Values.ToArray(Function(x) x.ToModel)
-        Dim names = datas.ToArray(Function(x) x.uid)
+        Dim datas = result.Values.Select(Function(x) x.ToModel)
+        Dim names = datas.Select(Function(x) x.uid)
         Dim Tree As KMeans.Entity() = KMeans.TreeCluster(datas)
-        Dim saveResult = Tree.ToArray(Function(x) x.ToLDM(mapNames))
+        Dim saveResult = Tree.Select(Function(x) x.ToLDM(mapNames))
 
         For Each name In names
             For Each x In saveResult
-                If InStr(x.Name, name) > 0 Then
-                    x.Cluster = x.Name.Replace(name & ".", "")
-                    x.Name = name
+                If InStr(x.ID, name) > 0 Then
+                    x.Cluster = x.ID.Replace(name & ".", "")
+                    x.ID = name
                     Exit For
                 End If
             Next
@@ -233,9 +239,9 @@ Partial Module CLI
         Dim resultSet As EntityLDM() = __clusterFastCommon(loads, args("/ldm"))
         Dim QueryHash As Dictionary(Of AnnotationModel) = loads.ToDictionary
         '将Entity和sites位点联系起来
-        Dim asso = (From x In resultSet Select x, sites = QueryHash(x.Name)).ToArray
-        Dim merges = (From gene In (From x In asso Select __expends(x.x, x.sites)).Unlist Select gene Group gene By gene.Name Into Group).ToArray
-        Dim result As EntityLDM() = merges.ToArray(Function(x) __merges(x.Group.ToArray), parallel:=True)
+        Dim asso = (From x In resultSet Select x, sites = QueryHash(x.ID)).ToArray
+        Dim merges = (From gene In (From x In asso Select __expends(x.x, x.sites)).Unlist Select gene Group gene By gene.ID Into Group).ToArray
+        Dim result As EntityLDM() = merges.Select(Function(x) __merges(x.Group.ToArray)).ToArray
 
         Call result.SaveTo(out & "/resultSet.Csv")
 
@@ -250,12 +256,12 @@ Partial Module CLI
         Dim prop As New Dictionary(Of String, Double)
 
         For Each key As String In keys
-            Dim value As Double() = source.ToArray(Function(x) x.Properties(key))
+            Dim value As Double() = source.Select(Function(x) x.Properties(key))
             Call prop.Add(key, value.Average)
         Next
 
         Return New EntityLDM With {
-            .Name = source.First.Name,
+            .ID = source.First.ID,
             .Properties = prop
         }
     End Function
@@ -264,7 +270,7 @@ Partial Module CLI
         Dim LQuery = (From x As LDM.Site
                       In site.Sites
                       Select New EntityLDM With {
-                          .Name = x.Name,
+                          .ID = x.Name,
                           .Cluster = source.Cluster,
                           .Properties = New Dictionary(Of String, Double)(source.Properties)}).ToArray
         Return LQuery
@@ -291,7 +297,7 @@ Partial Module CLI
                                   Select SWTom.Compare(x, hit, param)).ToArray).ToArray
         Dim resultSet = (From x In LQuery   ' 生成数据集
                          Select New EntityLDM With {
-                             .Name = x.x.Uid,
+                             .ID = x.x.Uid,
                              .Properties = (From hit As Output In x.prop
                                             Select hit.Subject.Uid,
                                                 score = hit.Similarity) _
@@ -317,10 +323,10 @@ Partial Module CLI
 
         If args.GetBoolean("/ldm_loads") Then
             Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.xml")
-            source = files.ToArray(Function(x) x.LoadXml(Of AnnotationModel))
+            source = files.Select(Function(x) x.LoadXml(Of AnnotationModel))
         Else
             Dim files = FileIO.FileSystem.GetFiles(query, FileIO.SearchOption.SearchAllSubDirectories, "*.txt")
-            source = files.ToArray(Function(x) AnnotationModel.LoadDocument(x)).ToVector
+            source = files.Select(Function(x) AnnotationModel.LoadDocument(x)).ToVector
         End If
 
         If Not String.IsNullOrEmpty(args("/map")) Then
@@ -365,7 +371,7 @@ Partial Module CLI
         Dim maps As Dictionary(Of String, String) = Nothing
 
         If Not String.IsNullOrEmpty(map) Then  ' 提升对其他的数据源的兼容性
-            maps = New Dictionary(Of String, String) From {{map, NameOf(EntityLDM.Name)}}
+            maps = New Dictionary(Of String, String) From {{map, NameOf(EntityLDM.ID)}}
         End If
 
         Dim inEntity = inMAT.LoadCsv(Of EntityLDM)(maps:=maps)
@@ -379,11 +385,11 @@ Partial Module CLI
         Dim inMAT As String = args("/in")
         Dim out As String = args.GetValue("/out", inMAT.TrimSuffix & ".Cluster.Csv")
         Dim MAT = inMAT.LoadCsv(Of RPKMStat)(fast:=True)
-        Dim inEntity = MAT.ToArray(
+        Dim inEntity = MAT.Select(
             Function(x) New EntityLDM With {
-                .Name = x.Locus,
+                .ID = x.Locus,
                 .Properties = x.Properties
-            })
+            }).ToArray
         Dim saveResult As EntityLDM() = KMeans.TreeCluster(inEntity)
         Return saveResult.SaveTo(out).CLICode
     End Function
@@ -463,8 +469,8 @@ Partial Module CLI
                 New Dictionary(Of String, Integer)
             Dim modsId As String() = __getMods(x.Properties.Keys.ToArray, mods, cats, dist)
 
-            Call result.Add(x.Name, modsId)
-            Call modsDist.Add(x.Name, dist)
+            Call result.Add(x.ID, modsId)
+            Call modsDist.Add(x.ID, dist)
         Next
 
         Return result
@@ -483,12 +489,12 @@ Partial Module CLI
         Dim orders = (From x In catQuery
                       Where Not String.Equals(CCM, x.mod, StringComparison.Ordinal)
                       Select x.mod,
-                          ss = x.Group.ToArray(Function(xx) xx.Count).Sum
+                          ss = x.Group.Select(Function(xx) xx.Count).Sum
                       Order By ss Descending).ToArray
 
         modSum = orders.ToDictionary(Function(x) x.mod, Function(x) x.ss)
 
-        Dim out = orders.ToArray(Function(x) x.mod)
+        Dim out = orders.Select(Function(x) x.mod)
         Return out
     End Function
 
@@ -527,7 +533,7 @@ Partial Module CLI
                           Select x
                           Group x By x.hit_name Into Group) _
                                .ToDictionary(Function(x) x.hit_name,
-                                             Function(x) x.Group.ToArray(Function(xx) xx.Family).ToArray)
+                                             Function(x) x.Group.Select(Function(xx) xx.Family).ToArray)
 
         For Each edge As NetworkEdge In net.Edges
             Dim depth As Integer = edge.FromNode.Split("."c).Length
@@ -542,7 +548,7 @@ Partial Module CLI
             Call edge.Properties.Add(NameOf(mName), mName)
         Next
 
-        Dim maxLen As Integer = modsHash.ToArray(Function(x) x.Value.Length).Max
+        Dim maxLen As Integer = modsHash.Select(Function(x) x.Value.Length).Max
 
         For Each node In net.Nodes
             If Not String.Equals(node.NodeType, "Entity", StringComparison.OrdinalIgnoreCase) Then
@@ -580,12 +586,12 @@ Partial Module CLI
         Next
 
         Dim MATHash = MAT.ToDictionary
-        Dim modsdE As EntityLDM() = modsDist.ToArray(
+        Dim modsdE As EntityLDM() = modsDist.Select(
             Function(Id, modsD) New EntityLDM With {
-                .Name = Id,
+                .ID = Id,
                 .Cluster = MATHash(Id).Cluster,
                 .Properties = modsD.ToDictionary(Function(x) x.Key, Function(x) CDbl(x.Value))
-            })
+            }).ToArray
         Call modsdE.SaveTo(out & "/TF-Mods.Csv")
 
         Return net.Save(out, Encodings.ASCII).CLICode
@@ -735,7 +741,7 @@ Partial Module CLI
                           Select x
                           Group x By x.QueryName Into Group) _
                                .ToDictionary(Function(x) x.QueryName,
-                                             Function(x) x.Group.ToArray(Function(xx) xx.Family).Distinct.ToArray)
+                                             Function(x) x.Group.Select(Function(xx) xx.Family).Distinct.ToArray)
 
         For Each edge As NetworkEdge In net.Edges
             Dim depth As Integer = edge.FromNode.Split("."c).Length
