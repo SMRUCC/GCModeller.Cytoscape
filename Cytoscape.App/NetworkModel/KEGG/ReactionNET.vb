@@ -1,4 +1,4 @@
-﻿#Region "Microsoft.VisualBasic::ab86a727c9f09f82afaf3206094511c3, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\ReactionNET.vb"
+﻿#Region "Microsoft.VisualBasic::a68a9a6808d8c44b17d2dfdd6879af50, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\KEGG\ReactionNET.vb"
 
     ' Author:
     ' 
@@ -133,7 +133,7 @@ Namespace NetworkModel.KEGG
                               Where source.ContainsKey(x)
                               Select source(x)).IteratesALL
             Dim rxns = (From x In source.Values.IteratesALL
-                        Where StringHelpers.IsNullOrEmpty(x.ECNum)
+                        Where StringHelpers.IsNullOrEmpty(x.Enzyme)
                         Select x).Join(mapsSource).ToArray
             Dim net As FileStream.NetworkTables = BuildNET(rxns)
             Return net

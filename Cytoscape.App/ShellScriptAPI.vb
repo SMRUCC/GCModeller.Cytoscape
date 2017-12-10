@@ -1,4 +1,4 @@
-﻿#Region "Microsoft.VisualBasic::7ce41832629ba0e843212d32832391e7, ..\interops\visualize\Cytoscape\Cytoscape.App\ShellScriptAPI.vb"
+﻿#Region "Microsoft.VisualBasic::8d71563c85aea2a0a4130d7372457a3c, ..\interops\visualize\Cytoscape\Cytoscape.App\ShellScriptAPI.vb"
 
     ' Author:
     ' 
@@ -122,7 +122,7 @@ Public Module ShellScriptAPI
     Public Function CreateMapNetworkData(RefMap As ReferenceMapData) As Graph
         Dim Reaction = (From refRxn As ReferenceReaction In RefMap.Reactions
                         Let Orthology As String() = (From obj In RefMap.GetGeneOrthology(refRxn) Select obj.Key.Description).ToArray
-                        Select (From xId As String In refRxn.ECNum
+                        Select (From xId As String In refRxn.Enzyme
                                 Select ID = String.Format("[{0}] {1}", xId, refRxn.Entry),
                                     DataModel = refRxn.ReactionModel,
                                     refRxnX = refRxn,
