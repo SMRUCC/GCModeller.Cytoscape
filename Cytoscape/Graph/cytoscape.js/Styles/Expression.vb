@@ -1,15 +1,16 @@
-﻿#Region "Microsoft.VisualBasic::a45a5b14d2539bfb4108595e4e8c4a4e, ..\interops\visualize\Cytoscape\Cytoscape\Graph\cytoscape.js\Styles\Expression.vb"
+﻿#Region "Microsoft.VisualBasic::2d3abd4c0a7a8006e5f27647498f899b, visualize\Cytoscape\Cytoscape\Graph\cytoscape.js\Styles\Expression.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
-    '       xieguigang (xie.guigang@live.com)
     '       xie (genetics@smrucc.org)
+    '       xieguigang (xie.guigang@live.com)
     ' 
-    ' Copyright (c) 2016 GPL3 Licensed
+    ' Copyright (c) 2018 GPL3 Licensed
     ' 
     ' 
     ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
     ' 
     ' This program is free software: you can redistribute it and/or modify
     ' it under the terms of the GNU General Public License as published by
@@ -24,9 +25,26 @@
     ' You should have received a copy of the GNU General Public License
     ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+
+    ' /********************************************************************************/
+
+    ' Summaries:
+
+    '     Delegate Function
+    ' 
+    ' 
+    '     Module Expression
+    ' 
+    '         Function: ValueMap
+    ' 
+    ' 
+    ' 
+    ' /********************************************************************************/
+
 #End Region
 
-Imports Microsoft.VisualBasic.ComponentModel.Ranges
+Imports Microsoft.VisualBasic.ComponentModel.Ranges.Model
 Imports Microsoft.VisualBasic.Data.csv.IO
 
 Namespace CytoscapeGraphView.Cyjs.style

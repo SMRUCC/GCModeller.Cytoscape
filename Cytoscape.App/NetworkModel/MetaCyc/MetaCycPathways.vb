@@ -1,15 +1,16 @@
-﻿#Region "Microsoft.VisualBasic::bfb64afb73dd19afa223e7aab064cd3e, ..\interops\visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\MetaCycPathways.vb"
+﻿#Region "Microsoft.VisualBasic::8ff817f329e16590e56ebcd354326016, visualize\Cytoscape\Cytoscape.App\NetworkModel\MetaCyc\MetaCycPathways.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
-    '       xieguigang (xie.guigang@live.com)
     '       xie (genetics@smrucc.org)
+    '       xieguigang (xie.guigang@live.com)
     ' 
-    ' Copyright (c) 2016 GPL3 Licensed
+    ' Copyright (c) 2018 GPL3 Licensed
     ' 
     ' 
     ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
     ' 
     ' This program is free software: you can redistribute it and/or modify
     ' it under the terms of the GNU General Public License as published by
@@ -24,16 +25,35 @@
     ' You should have received a copy of the GNU General Public License
     ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+
+    ' /********************************************************************************/
+
+    ' Summaries:
+
+    ' Class MetaCycPathways
+    ' 
+    '     Properties: AssociatedGenes, ContiansSubPathway, Identifier, MetaCycBaseType, ReactionList
+    '                 SuperPathway
+    ' 
+    '     Function: __generatePwy, Performance, ToString
+    ' 
+    '     Sub: New
+    ' 
+    '  
+    ' 
+    '     Function: CreateGeneCollection, GenerateReport
+    ' 
+    ' /********************************************************************************/
+
 #End Region
 
 Imports System.Text
 Imports System.Xml.Serialization
-Imports Microsoft.VisualBasic
-Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
 Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Language
-Imports SMRUCC.genomics.Assembly
+Imports Microsoft.VisualBasic.Text.Xml.Models
 Imports SMRUCC.genomics.Assembly.MetaCyc.File.DataFiles
 Imports SMRUCC.genomics.Assembly.MetaCyc.File.FileSystem
 
@@ -87,13 +107,13 @@ Public Class MetaCycPathways
             .MetaCycBaseType = pwyObj
         } ' 实例化一个返回对象
         pathway.ReactionList =
-            LinqAPI.Exec(Of Key_strArrayValuePair) <=
+            LinqAPI.Exec(Of NamedVector(Of String)) <=
                 From rxnId As String
                 In pwyObj.ReactionList
                 Where RxnGeneLinks.ContainsKey(rxnId)
-                Select New Key_strArrayValuePair With {
-                    .Key = rxnId,
-                    .Value = RxnGeneLinks(rxnId)
+                Select New NamedVector(Of String) With {
+                    .name = rxnId,
+                    .vector = RxnGeneLinks(rxnId)
                 }     '获取反应对象列表
         Return pathway
     End Function
@@ -108,7 +128,7 @@ Public Class MetaCycPathways
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Property SuperPathway As Boolean
-        Public Property ReactionList As Key_strArrayValuePair()
+        Public Property ReactionList As NamedVector(Of String)()
         ''' <summary>
         ''' 本代谢途径所包含的的亚途径
         ''' </summary>
@@ -121,7 +141,7 @@ Public Class MetaCycPathways
             Get
                 Dim List As List(Of String) = New List(Of String)
                 For Each rxn In ReactionList
-                    Call List.AddRange(rxn.Value)
+                    Call List.AddRange(rxn.vector)
                 Next
                 If SuperPathway Then
                     For Each pwy In ContiansSubPathway

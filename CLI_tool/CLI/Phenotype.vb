@@ -1,15 +1,16 @@
-﻿#Region "Microsoft.VisualBasic::28445412324b491fe0a779c9981ecfb7, ..\interops\visualize\Cytoscape\CLI_tool\CLI\Phenotype.vb"
+﻿#Region "Microsoft.VisualBasic::7c51afb42ee5f46425aabbe6f4f365c0, visualize\Cytoscape\CLI_tool\CLI\Phenotype.vb"
 
     ' Author:
     ' 
     '       asuka (amethyst.asuka@gcmodeller.org)
-    '       xieguigang (xie.guigang@live.com)
     '       xie (genetics@smrucc.org)
+    '       xieguigang (xie.guigang@live.com)
     ' 
-    ' Copyright (c) 2016 GPL3 Licensed
+    ' Copyright (c) 2018 GPL3 Licensed
     ' 
     ' 
     ' GNU GENERAL PUBLIC LICENSE (GPL3)
+    ' 
     ' 
     ' This program is free software: you can redistribute it and/or modify
     ' it under the terms of the GNU General Public License as published by
@@ -24,12 +25,33 @@
     ' You should have received a copy of the GNU General Public License
     ' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
+
+    ' /********************************************************************************/
+
+    ' Summaries:
+
+    ' Module CLI
+    ' 
+    '     Function: __clusterFastCommon, __clusteringCommon, __expends, __getMaxMods, __getMaxRelates
+    '               __getMods, __merges, BuildTreeNET, BuildTreeNET_DEGs, BuildTreeNET_KEGGModules
+    '               BuildTreeNET_KEGGPathways, BuildTreeNET_MergeRegulons, BuildTreeNETCOGs, BuildTreeNetTF, ClusterMatrix
+    '               FastCluster, MotifCluster, MotifClusterSites, rFBATreeCluster, TreeCluster
+    ' 
+    '     Sub: __briefTrim, New
+    '     Class FamilyHit
+    ' 
+    '         Properties: Family, HitName, QueryName
+    ' 
+    ' 
+    ' 
+    ' /********************************************************************************/
+
 #End Region
 
 Imports System.Text.RegularExpressions
 Imports Microsoft.VisualBasic.CommandLine
 Imports Microsoft.VisualBasic.CommandLine.Reflection
-Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.ComponentModel.DataStructures
 Imports Microsoft.VisualBasic.Data.csv
@@ -41,6 +63,7 @@ Imports Microsoft.VisualBasic.Linq
 Imports Microsoft.VisualBasic.Linq.Extensions
 Imports Microsoft.VisualBasic.Terminal.Utility
 Imports Microsoft.VisualBasic.Text
+Imports Microsoft.VisualBasic.Text.Xml.Models
 Imports SMRUCC.genomics.Analysis.FBA_DP.Models.rFBA
 Imports SMRUCC.genomics.Assembly.KEGG.DBGET
 Imports SMRUCC.genomics.Assembly.NCBI.COG
@@ -798,11 +821,11 @@ Partial Module CLI
         If (args <= "/familyinfo").DirectoryExists Then
             Dim regulons = (From file As String
                             In FileIO.FileSystem.GetFiles(args("/familyinfo"), FileIO.SearchOption.SearchTopLevelOnly, "*.xml").AsParallel
-                            Let regs = file.LoadXml(Of BacteriaGenome).Regulons
-                            Where Not regs Is Nothing OrElse regs.Regulators.IsNullOrEmpty
-                            Select regs.Regulators).ToArray.ToVector
+                            Let regs = file.LoadXml(Of BacteriaRegulome).regulons
+                            Where Not regs Is Nothing OrElse regs.regulators.IsNullOrEmpty
+                            Select regs.regulators).ToArray.ToVector
             FamilyHash = (From x As Regulator In regulons
-                          Let uid As String = x.LocusId & "." & x.LocusTag.Value.Replace(":", "_")
+                          Let uid As String = x.LocusId & "." & x.locus_tag.text.Replace(":", "_")
                           Select x,
                               uid
                           Group By uid Into Group) _
@@ -833,10 +856,10 @@ Partial Module CLI
 
                 If FamilyHash.ContainsKey(bbh) Then
                     Dim Family = FamilyHash(bbh)
-                    Call edge.Properties.Add("Family", Family.Family)
-                    Call edge.Properties.Add("Effector", Family.Effector)
-                    Call edge.Properties.Add("BiologicalProcess", Family.BiologicalProcess)
-                    Call edge.Properties.Add("Pathway", Family.Pathway)
+                    Call edge.Properties.Add("Family", Family.family)
+                    Call edge.Properties.Add("Effector", Family.effector)
+                    Call edge.Properties.Add("BiologicalProcess", Family.biological_process)
+                    Call edge.Properties.Add("Pathway", Family.pathway)
                 End If
             End If
         Next
@@ -859,11 +882,11 @@ Partial Module CLI
 
                 If FamilyHash.ContainsKey(bbh) Then
                     Dim Family = FamilyHash(bbh)
-                    Call node.Properties.Add("Family", Family.Family)
-                    Call node.Properties.Add("Effector", Family.Effector)
-                    Call node.Properties.Add("BiologicalProcess", Family.BiologicalProcess)
-                    Call node.Properties.Add("Pathway", Family.Pathway)
-                    Call node.Properties.Add("Phenotype", $"[{hit(Scan0)}]{Family.BiologicalProcess}")
+                    Call node.Properties.Add("Family", Family.family)
+                    Call node.Properties.Add("Effector", Family.effector)
+                    Call node.Properties.Add("BiologicalProcess", Family.biological_process)
+                    Call node.Properties.Add("Pathway", Family.pathway)
+                    Call node.Properties.Add("Phenotype", $"[{hit(Scan0)}]{Family.biological_process}")
                 End If
             End If
         Next
