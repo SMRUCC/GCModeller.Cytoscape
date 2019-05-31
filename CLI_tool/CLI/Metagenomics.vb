@@ -46,8 +46,9 @@ Imports Microsoft.VisualBasic.CommandLine
 Imports Microsoft.VisualBasic.CommandLine.Reflection
 Imports Microsoft.VisualBasic.Data.csv
 Imports Microsoft.VisualBasic.Data.csv.IO
+Imports Microsoft.VisualBasic.Data.visualize
+Imports Microsoft.VisualBasic.Data.visualize.KMeans
 Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream
-Imports Microsoft.VisualBasic.DataMining
 Imports Microsoft.VisualBasic.DataMining.KMeans
 Imports Microsoft.VisualBasic.Imaging.Drawing2D.Colors
 Imports Microsoft.VisualBasic.Language
@@ -213,7 +214,7 @@ Partial Module CLI
         Dim skipExists As Boolean = args.GetBoolean("/skip-exists")
         Dim xid$() = taxdata _
             .Select(Function(x) x.Reference) _
-            .Select(TaxidMaps.GetParser(gi2taxid)) _
+            .Select(AddressOf TaxidMaps.GetParser(gi2taxid).Invoke) _
             .Distinct _
             .ToArray
         Dim theme$ = args.GetValue("/theme-color", "Paired:c12")
