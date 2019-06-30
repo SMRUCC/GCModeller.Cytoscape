@@ -1,4 +1,4 @@
-﻿#Region "Microsoft.VisualBasic::d50580861295f0352d2ba1f141f556e7, visualize\Cytoscape\Cytoscape\Graph\Serialization\ExportToFile.vb"
+﻿#Region "Microsoft.VisualBasic::efb327d87ab74b0e5c69de0cd0d524db, Cytoscape\Cytoscape\Graph\Serialization\ExportToFile.vb"
 
     ' Author:
     ' 
@@ -47,7 +47,6 @@ Imports Microsoft.VisualBasic.Data.csv.StorageProvider.ComponentModels
 Imports Microsoft.VisualBasic.Data.csv.StorageProvider.Reflection.Reflector
 Imports Microsoft.VisualBasic.Data.visualize.Network
 Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream.Generic
-Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream.Generic.NameOf
 Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream.NetworkEdge
 Imports Microsoft.VisualBasic.Data.visualize.Network.FileStream.Node
 Imports Microsoft.VisualBasic.Data.visualize.Network.Graph.Abstract
