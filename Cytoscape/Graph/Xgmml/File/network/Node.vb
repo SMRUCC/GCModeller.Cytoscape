@@ -51,7 +51,7 @@ Imports Microsoft.VisualBasic.ComponentModel
 Namespace CytoscapeGraphView.XGMML.File
 
     <XmlType("node")>
-    Public Class Node : Inherits AttributeDictionary
+    Public Class XGMMLnode : Inherits AttributeDictionary
         Implements IAddressOf
 
         ''' <summary>
@@ -62,9 +62,9 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' <remarks></remarks>
         <XmlAttribute> Public Property id As Integer Implements IAddressOf.Address
         <XmlAttribute> Public Property label As String
-        <XmlElement("graphics")> Public Property Graphics As NodeGraphics
+        <XmlElement("graphics")> Public Property graphics As NodeGraphics
 
-        Public ReadOnly Property Location As Point
+        Public ReadOnly Property location As Point
             Get
                 Return New Point(Graphics.x, Graphics.y)
             End Get
