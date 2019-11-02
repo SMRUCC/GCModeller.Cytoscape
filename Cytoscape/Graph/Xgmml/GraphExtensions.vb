@@ -47,6 +47,7 @@ Imports Microsoft.VisualBasic.Linq
 
 Namespace CytoscapeGraphView.XGMML
 
+    <HideModuleName>
     Public Module GraphExtensions
 
         <Extension>
