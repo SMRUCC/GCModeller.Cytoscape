@@ -1,4 +1,5 @@
-﻿Imports Microsoft.VisualBasic.Language
+﻿Imports System.Drawing
+Imports Microsoft.VisualBasic.Language
 Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML.File
 
 Namespace CytoscapeGraphView.XGMML
@@ -12,6 +13,27 @@ Namespace CytoscapeGraphView.XGMML
             graph = g
             nodeTable = g.nodes.ToDictionary(Function(n) n.label)
         End Sub
+
+        Public Function GetEdgeBends(edge As XGMMLedge) As PointF()
+            Dim [handles] As Handle() = edge.graphics.edgeBendHandles
+            Dim s = GetNode(edge.source)
+            Dim t = GetNode(edge.target)
+            Dim sx = s.graphics.x
+            Dim sy = s.graphics.y
+            Dim tx = t.graphics.x
+            Dim ty = t.graphics.y
+            Dim bends As PointF() = [handles] _
+                .Select(Function(b)
+                            If b.isDirectPoint Then
+                                Return b.originalLocation
+                            Else
+                                Return b.convert(sx, sy, tx, ty)
+                            End If
+                        End Function) _
+                .ToArray
+
+            Return bends
+        End Function
 
         ''' <summary>
         ''' 
