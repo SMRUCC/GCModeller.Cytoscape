@@ -48,7 +48,7 @@
 
 Imports System.Xml.Serialization
 
-Namespace CytoscapeGraphView.XGMML
+Namespace CytoscapeGraphView.XGMML.File
 
     Public Class Graphics : Inherits AttributeDictionary
 

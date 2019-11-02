@@ -52,7 +52,7 @@ Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Text
 
-Namespace CytoscapeGraphView.XGMML
+Namespace CytoscapeGraphView.XGMML.File
 
     ''' <summary>
     ''' The Cytoscape software XML format network visualization model.(Cytoscape软件的网络XML模型文件)

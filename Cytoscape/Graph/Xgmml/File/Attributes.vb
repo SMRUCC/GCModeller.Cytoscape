@@ -54,7 +54,7 @@ Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.ComponentModel.Collection.Generic
 Imports Microsoft.VisualBasic.Language
 
-Namespace CytoscapeGraphView.XGMML
+Namespace CytoscapeGraphView.XGMML.File
 
     ''' <summary>
     ''' 一个网络之中的对象所具备有的属性值

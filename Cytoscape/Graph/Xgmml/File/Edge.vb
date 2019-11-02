@@ -48,7 +48,7 @@
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
 
-Namespace CytoscapeGraphView.XGMML
+Namespace CytoscapeGraphView.XGMML.File
 
     <XmlType("edge")>
     Public Class Edge : Inherits AttributeDictionary

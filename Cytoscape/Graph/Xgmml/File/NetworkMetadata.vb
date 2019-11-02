@@ -53,7 +53,7 @@ Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.MIME.application.rdf_xml
 Imports Microsoft.VisualBasic.Serialization.JSON
 
-Namespace CytoscapeGraphView.XGMML
+Namespace CytoscapeGraphView.XGMML.File
 
     Public Class InnerRDF
 

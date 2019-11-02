@@ -41,9 +41,9 @@
 #End Region
 
 Imports System.Runtime.CompilerServices
-Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq
+Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
 
 Namespace CytoscapeGraphView.XGMML
 
