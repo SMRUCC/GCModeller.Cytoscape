@@ -55,6 +55,7 @@ Imports Microsoft.VisualBasic.Serialization.JSON
 
 Namespace CytoscapeGraphView.XGMML.File
 
+    <XmlType("RDF", [Namespace]:=RDF.XmlnsNamespace)>
     Public Class InnerRDF
 
         <XmlElement("Description", [Namespace]:=RDF.XmlnsNamespace)>
