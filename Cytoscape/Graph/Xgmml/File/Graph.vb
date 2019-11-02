@@ -48,7 +48,6 @@ Imports System.Drawing
 Imports System.Text
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
-Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.MIME.application
 Imports Microsoft.VisualBasic.Text
@@ -88,53 +87,37 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' </summary>
         ''' <returns></returns>
         <XmlIgnore>
-        Public Property NetworkMetaData As NetworkMetadata
+        Public ReadOnly Property networkMetadata As NetworkMetadata
             Get
-                If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
-                    Return _attrs(ATTR_NAME_NETWORK_METADATA).RDF.meta
-                Else
-                    Return Nothing
-                End If
+                Return attributes _
+                    .Where(Function(a) a.name = "networkMetadata") _
+                    .FirstOrDefault() _
+                    .RDF _
+                    .meta
             End Get
-            Set(value As NetworkMetadata)
-                If _attrs.ContainsKey(ATTR_NAME_NETWORK_METADATA) Then
-                    _attrs(ATTR_NAME_NETWORK_METADATA).RDF =
-                        New InnerRDF With {
-                            .meta = value
-                    }
-                Else
-                    _attrs(ATTR_NAME_NETWORK_METADATA) =
-                        New GraphAttribute With {
-                            .Name = ATTR_NAME_NETWORK_METADATA,
-                            .RDF = New InnerRDF With {
-                                .meta = value
-                        }
-                    }
-                End If
-            End Set
         End Property
 
         <XmlElement("att")> Public Property attributes As GraphAttribute()
         <XmlElement("graphics")> Public Property graphics As Graphics
-        <XmlElement("node")> Public Property Nodes As Node()
+        <XmlElement("node")> Public Property Nodes As XGMMLnode()
             Get
                 If _nodeList.IsNullOrEmpty Then
-                    Return New Node() {}
+                    Return New XGMMLnode() {}
                 End If
                 Return _nodeList.Values.ToArray
             End Get
-            Set(value As Node())
+            Set(value As XGMMLnode())
                 If value.IsNullOrEmpty Then
-                    _nodeList = New Dictionary(Of String, Node)
+                    _nodeList = New Dictionary(Of String, XGMMLnode)
                 Else
                     _nodeList = value.ToDictionary(Function(obj) obj.label)
                 End If
             End Set
         End Property
 
-        <XmlElement("edge")> Public Property Edges As Edge()
+        <XmlElement("edge")> Public Property Edges As XGMMLedge()
 
-        Dim _nodeList As Dictionary(Of String, Node)
+        Dim _nodeList As Dictionary(Of String, XGMMLnode)
 
         <XmlNamespaceDeclarations()>
         Public xmlns As XmlSerializerNamespaces
@@ -163,15 +146,15 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' </summary>
         ''' <param name="Label">Synonym</param>
         ''' <returns></returns>
-        Public Function GetNode(Label As String) As Node
-            Dim Node As Node = Nothing
+        Public Function GetNode(Label As String) As XGMMLnode
+            Dim Node As XGMMLnode = Nothing
             Call _nodeList.TryGetValue(Label, Node)
             Return Node
         End Function
 
-        Public Function GetNode(ID As Long) As Node
-            Return LinqAPI.DefaultFirst(Of Node) <=
-                From node As Node
+        Public Function GetNode(ID As Long) As XGMMLnode
+            Return LinqAPI.DefaultFirst(Of XGMMLnode) <=
+                From node As XGMMLnode
                 In Me._nodeList.Values
                 Where node.id = ID
                 Select node
@@ -189,16 +172,16 @@ Namespace CytoscapeGraphView.XGMML.File
         End Function
 
         Public Function GetSize(Optional Scale As Double = 1) As Size
-            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.Graphics.x).Max * (Scale + 1)
-            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.Graphics.y).Max * (Scale + 1)
+            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.graphics.x).Max * (Scale + 1)
+            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.graphics.y).Max * (Scale + 1)
 
             Return New Size(Max_X, Max_Y)
         End Function
 
         Public ReadOnly Property Size As Size
             Get
-                Dim width = Me.Graphics("NETWORK_WIDTH")
-                Dim height = Me.Graphics("NETWORK_HEIGHT")
+                Dim width = Me.graphics("NETWORK_WIDTH")
+                Dim height = Me.graphics("NETWORK_HEIGHT")
 
                 If width Is Nothing OrElse height Is Nothing Then
                     Return GetSize()
@@ -223,7 +206,7 @@ Namespace CytoscapeGraphView.XGMML.File
             Return Graph
         End Function
 
-        Public Function ExistEdge(Edge As Edge) As Boolean
+        Public Function ExistEdge(Edge As XGMMLedge) As Boolean
             Return Not (GetNode(Edge.source) Is Nothing OrElse GetNode(Edge.target) Is Nothing)
         End Function
 
@@ -236,7 +219,7 @@ Namespace CytoscapeGraphView.XGMML.File
             Dim Graph As Graph = Graph.CreateObject
 
             Graph.label = Title
-            Graph.NetworkMetaData.Title = Title.Replace("<", "[").Replace(">", "]")
+            Graph.NetworkMetaData.title = Title.Replace("<", "[").Replace(">", "]")
             Graph.NetworkMetaData.type = Type.Replace("<", "[").Replace(">", "]")
             Graph.NetworkMetaData.description = Description.Replace("<", "[").Replace(">", "]")
             Return Graph
