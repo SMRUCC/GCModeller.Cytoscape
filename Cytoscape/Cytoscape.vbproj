@@ -227,6 +227,7 @@
     <Compile Include="Graph\Visualization\Node.vb" />
     <Compile Include="Graph\Serialization\GraphicsMapper.vb" />
     <Compile Include="Graph\Xgmml\Attributes.vb" />
+    <Compile Include="Graph\Xgmml\Handle.vb" />
     <Compile Include="Graph\Xgmml\NodeGraphics.vb" />
     <Compile Include="Graph\Xgmml\NameOf.vb" />
     <Compile Include="Graph\Xgmml\GraphExtensions.vb" />
