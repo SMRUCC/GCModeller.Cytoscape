@@ -201,7 +201,7 @@ Namespace CytoscapeGraphView.XGMML.File
                 .label = "",
                 .id = "",
                 .directed = "1",
-                .NetworkMetaData = New NetworkMetadata
+                .attributes = {NetworkMetadata.createAttribute}
             }
             Return Graph
         End Function
