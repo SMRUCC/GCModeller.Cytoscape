@@ -105,9 +105,9 @@ Namespace CytoscapeGraphView.Serialization
 
             VBDebugger.Mute = False
 
-            Model.Nodes = __exportNodes(nodeList, GetType(Node).GetDataFrameworkTypeSchema(False))
-            Model.Edges = __exportEdges(Of Edge)(edges,
-                                                 Nodes:=Model.Nodes.ToDictionary(Function(item) item.label),
+            Model.nodes = __exportNodes(nodeList, GetType(Node).GetDataFrameworkTypeSchema(False))
+            Model.edges = __exportEdges(Of Edge)(edges,
+                                                 Nodes:=Model.nodes.ToDictionary(Function(item) item.label),
                                                  EdgeTypeMapping:=GetType(Edge).GetDataFrameworkTypeSchema(False),
                                                  schema:=interMaps)
             Model.attributes = ModelAttributes
@@ -166,12 +166,12 @@ Namespace CytoscapeGraphView.Serialization
             }
             Dim EdgeSchema = SchemaProvider.CreateObject(GetType(Edge), False)
             Dim interMaps = __mapInterface(EdgeSchema)
-            Dim hash As Dictionary(Of String, XGMMLnode) = Model.Nodes.ToDictionary(Function(x) x.label)
+            Dim hash As Dictionary(Of String, XGMMLnode) = Model.nodes.ToDictionary(Function(x) x.label)
 
             VBDebugger.Mute = True
 
-            Model.Nodes = __exportNodes(NodeList, NodeTypeMapping)
-            Model.Edges = __exportEdges(Edges, hash, EdgeTypeMapping, interMaps)
+            Model.nodes = __exportNodes(NodeList, NodeTypeMapping)
+            Model.edges = __exportEdges(Edges, hash, EdgeTypeMapping, interMaps)
             Model.attributes = ModelAttributes
 
             VBDebugger.Mute = False

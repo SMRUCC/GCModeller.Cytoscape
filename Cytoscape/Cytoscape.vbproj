@@ -226,6 +226,7 @@
     <Compile Include="Graph\cytoscape.js\Cyjs.vb" />
     <Compile Include="Graph\Visualization\Node.vb" />
     <Compile Include="Graph\Serialization\GraphicsMapper.vb" />
+    <Compile Include="Graph\Xgmml\GraphIndex.vb" />
     <Compile Include="Graph\Xgmml\File\Attributes.vb" />
     <Compile Include="Graph\Xgmml\Handle.vb" />
     <Compile Include="Graph\Xgmml\File\network\NodeGraphics.vb" />

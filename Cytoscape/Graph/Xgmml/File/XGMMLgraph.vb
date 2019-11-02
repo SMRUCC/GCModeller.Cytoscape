@@ -99,25 +99,8 @@ Namespace CytoscapeGraphView.XGMML.File
 
         <XmlElement("att")> Public Property attributes As GraphAttribute()
         <XmlElement("graphics")> Public Property graphics As Graphics
-        <XmlElement("node")> Public Property Nodes As XGMMLnode()
-            Get
-                If _nodeList.IsNullOrEmpty Then
-                    Return New XGMMLnode() {}
-                End If
-                Return _nodeList.Values.ToArray
-            End Get
-            Set(value As XGMMLnode())
-                If value.IsNullOrEmpty Then
-                    _nodeList = New Dictionary(Of String, XGMMLnode)
-                Else
-                    _nodeList = value.ToDictionary(Function(obj) obj.label)
-                End If
-            End Set
-        End Property
-
-        <XmlElement("edge")> Public Property Edges As XGMMLedge()
-
-        Dim _nodeList As Dictionary(Of String, XGMMLnode)
+        <XmlElement("node")> Public Property nodes As XGMMLnode()
+        <XmlElement("edge")> Public Property edges As XGMMLedge()
 
         <XmlNamespaceDeclarations()>
         Public xmlns As XmlSerializerNamespaces
@@ -130,42 +113,6 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' dc:xxx
         ''' </summary>
         Public Const xmlns_dc$ = "http://purl.org/dc/elements/1.1/"
-
-        Public Sub New()
-            xmlns = New XmlSerializerNamespaces
-
-            xmlns.Add("cy", xmlnsCytoscape)
-            xmlns.Add("rdf", rdf_xml.RDF.XmlnsNamespace)
-            xmlns.Add("xlink", "http://www.w3.org/1999/xlink")
-            xmlns.Add("dc", xmlns_dc)
-        End Sub
-#End Region
-
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="Label">Synonym</param>
-        ''' <returns></returns>
-        Public Function GetNode(Label As String) As XGMMLnode
-            Dim Node As XGMMLnode = Nothing
-            Call _nodeList.TryGetValue(Label, Node)
-            Return Node
-        End Function
-
-        Public Function GetNode(ID As Long) As XGMMLnode
-            Return LinqAPI.DefaultFirst(Of XGMMLnode) <=
-                From node As XGMMLnode
-                In Me._nodeList.Values
-                Where node.id = ID
-                Select node
-        End Function
-
-        Public Function GetSize(Optional Scale As Double = 1) As Size
-            Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.graphics.x).Max * (Scale + 1)
-            Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.graphics.y).Max * (Scale + 1)
-
-            Return New Size(Max_X, Max_Y)
-        End Function
 
         Public ReadOnly Property Size As Size
             Get
@@ -180,23 +127,40 @@ Namespace CytoscapeGraphView.XGMML.File
             End Get
         End Property
 
+        Public Sub New()
+            xmlns = New XmlSerializerNamespaces
+
+            xmlns.Add("cy", xmlnsCytoscape)
+            xmlns.Add("rdf", rdf_xml.RDF.XmlnsNamespace)
+            xmlns.Add("xlink", "http://www.w3.org/1999/xlink")
+            xmlns.Add("dc", xmlns_dc)
+        End Sub
+#End Region
+
+        Public Function GetSize(Optional Scale As Double = 1) As Size
+            Dim Max_X As Integer = (From node In nodes.AsParallel Select node.graphics.x).Max * (Scale + 1)
+            Dim Max_Y As Integer = (From node In nodes.AsParallel Select node.graphics.y).Max * (Scale + 1)
+
+            Return New Size(Max_X, Max_Y)
+        End Function
+
+        Public Function GetNodeIndex() As GraphIndex
+            Return New GraphIndex(Me)
+        End Function
+
         ''' <summary>
         ''' 创建一个初始默认的网络文件
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Overloads Shared Function CreateObject() As XGMMLgraph
-            Dim Graph As New XGMMLgraph With {
+            Dim g As New XGMMLgraph With {
                 .label = "",
                 .id = "",
                 .directed = "1",
                 .attributes = {NetworkMetadata.createAttribute}
             }
-            Return Graph
-        End Function
-
-        Public Function ExistEdge(Edge As XGMMLedge) As Boolean
-            Return Not (GetNode(Edge.source) Is Nothing OrElse GetNode(Edge.target) Is Nothing)
+            Return g
         End Function
 
         ''' <summary>
@@ -212,15 +176,6 @@ Namespace CytoscapeGraphView.XGMML.File
             Graph.networkMetadata.type = Type.Replace("<", "[").Replace(">", "]")
             Graph.networkMetadata.description = Description.Replace("<", "[").Replace(">", "]")
             Return Graph
-        End Function
-
-        Public Function DeleteDuplication() As XGMMLgraph
-            Dim sw As Stopwatch = Stopwatch.StartNew
-
-            Call $"{NameOf(Edges)}:={Edges.Count } in the network model...".__DEBUG_ECHO
-            Me.Edges = Distinct(Me.Edges)
-            Call $"{NameOf(Edges)}:={Edges.Count } left after remove duplicates in {sw.ElapsedMilliseconds}ms....".__DEBUG_ECHO
-            Return Me
         End Function
 
         ''' <summary>
