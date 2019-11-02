@@ -59,7 +59,7 @@ Namespace CytoscapeGraphView.XGMML
             Return cosTheta & DELIMITER & sinTheta & DELIMITER & ratio
         End Function
 
-        Public Shared Function parseHandles(strRepresentation As String) As IEnumerable(Of Handle)
+        Friend Shared Function parseHandles(strRepresentation As String) As IEnumerable(Of Handle)
             Return strRepresentation _
                 .Split("|"c) _
                 .Select(Function(str)

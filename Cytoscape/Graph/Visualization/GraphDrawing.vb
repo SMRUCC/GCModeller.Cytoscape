@@ -108,7 +108,7 @@ Namespace CytoscapeGraphView
                     Dim pt1 = Nodes(Edge.source), pt2 = Nodes(Edge.target)
                     Dim a = pt1.Point_getInterface(pt2)
                     Dim b = pt2.Point_getInterface(pt1) '这个点是箭头的指向
-                    Dim Color As Color = Edge.Graphics.LineColor
+                    Dim Color As Color = Edge.Graphics.lineColor
                     Dim pen = New Pen(Color, Edge.Graphics.Width * ss)
 
                     pen.DashStyle = Drawing2D.DashStyle.Dash
