@@ -160,17 +160,6 @@ Namespace CytoscapeGraphView.XGMML.File
                 Select node
         End Function
 
-        ''' <summary>
-        ''' 使用这个方法才能够正确的加载一个cytoscape的网络模型文件
-        ''' </summary>
-        ''' <param name="path"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Shared Function Load(path As String) As Graph
-            Dim graph As Graph = path.LoadXml(Of Graph)(preprocess:=AddressOf RDFXml.TrimRDF)
-            Return graph
-        End Function
-
         Public Function GetSize(Optional Scale As Double = 1) As Size
             Dim Max_X As Integer = (From node In Nodes.AsParallel Select node.graphics.x).Max * (Scale + 1)
             Dim Max_Y As Integer = (From node In Nodes.AsParallel Select node.graphics.y).Max * (Scale + 1)

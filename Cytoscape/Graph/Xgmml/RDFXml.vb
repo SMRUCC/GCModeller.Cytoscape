@@ -41,24 +41,11 @@
 #End Region
 
 Imports System.Text
-Imports Microsoft.VisualBasic.Text.Xml
+Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML.File
 
-Namespace CytoscapeGraphView.XGMML.File
+Namespace CytoscapeGraphView.XGMML
 
-    Module RDFXml
-
-        Public Function TrimRDF(xml As String) As String
-            Dim sb As New StringBuilder(xml)
-
-            Call sb.Replace(" cy:", " cy-")
-            Call sb.Replace("rdf:", "rdf-")
-            Call sb.Replace("<dc:", "<dc-")
-            Call sb.Replace("/dc:", "/dc-")
-
-            xml = sb.ToString
-
-            Return xml
-        End Function
+    Public NotInheritable Class RDFXml
 
         Const XGMML As String = "http://www.cs.rpi.edu/XGMML"
         Const dc As String = "http://purl.org/dc/elements/1.1/"
@@ -66,38 +53,24 @@ Namespace CytoscapeGraphView.XGMML.File
         Const rdf As String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         Const cy As String = "http://www.cytoscape.org"
 
-        Public Function WriteXml(graph As Graph, encoding As Encoding, path As String) As Boolean
+        Public Shared Function WriteXml(graph As Graph, encoding As Encoding, path As String) As Boolean
             If graph.networkMetadata Is Nothing Then
                 graph.attributes.Add(NetworkMetadata.createAttribute)
             Else
                 graph.networkMetadata.about = "http://www.cytoscape.org/"
             End If
 
-            Return WriteXml(graph.GetXml, encoding, path)
+            Return graph.GetXml.SaveTo(path, encoding)
         End Function
 
-        Public Function WriteXml(xml As String, encoding As Encoding, path As String) As Boolean
-            Dim doc As New XmlDoc(xml)
-
-            doc.encoding = XmlEncodings.UTF8
-            doc.standalone = True
-            doc.version = "1.0"
-            doc.xmlns.xmlns = XGMML
-            doc.xmlns.xsd = ""
-            doc.xmlns.xsi = ""
-            doc.xmlns.Set(NameOf(dc), dc)
-            doc.xmlns.Set(NameOf(xlink), xlink)
-            doc.xmlns.Set(NameOf(rdf), rdf)
-            doc.xmlns.Set(NameOf(cy), cy)
-
-            Dim sb As New StringBuilder(doc.ToString)
-
-            Call sb.Replace(" cy-", " cy:")
-            Call sb.Replace("rdf-", "rdf:")
-            Call sb.Replace("<dc-", "<dc:")
-            Call sb.Replace("/dc-", "/dc:")
-
-            Return sb.SaveTo(path, encoding)
+        ''' <summary>
+        ''' 使用这个方法才能够正确的加载一个cytoscape的网络模型文件
+        ''' </summary>
+        ''' <param name="path"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Shared Function Load(path As String) As Graph
+            Return path.LoadXml(Of Graph)()
         End Function
-    End Module
+    End Class
 End Namespace
