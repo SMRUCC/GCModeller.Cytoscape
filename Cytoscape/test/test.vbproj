@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{7D91C048-8372-4F56-83DC-619A817625A9}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>Test.Module1</StartupObject>
+    <StartupObject>Test.xgmmlLoaderTest</StartupObject>
     <RootNamespace>Test</RootNamespace>
     <AssemblyName>Test</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module1.vb" />
+    <Compile Include="xgmmlLoaderTest.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
