@@ -245,7 +245,7 @@
     <Compile Include="Graph\VizMap\visualStyle\visualStyle.vb" />
     <Compile Include="Graph\VizMap\VizMap.vb" />
     <Compile Include="Graph\Serialization\ExportToFile.vb" />
-    <Compile Include="Graph\Xgmml\File\Graph.vb" />
+    <Compile Include="Graph\Xgmml\File\XGMMLgraph.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

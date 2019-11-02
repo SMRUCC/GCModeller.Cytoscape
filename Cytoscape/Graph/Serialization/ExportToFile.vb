@@ -66,7 +66,7 @@ Namespace CytoscapeGraphView.Serialization
         Public Function Export(Of Edge As INetworkEdge)(
                                  nodes As IEnumerable(Of FileStream.Node),
                                  edges As IEnumerable(Of Edge),
-                                 Optional title$ = "NULL") As Graph
+                                 Optional title$ = "NULL") As XGMMLgraph
 
             Return Export(Of FileStream.Node, Edge)(nodes.ToArray, edges.ToArray, title)
         End Function
@@ -81,8 +81,8 @@ Namespace CytoscapeGraphView.Serialization
         ''' <param name="title"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Export(Of Node As INode, Edge As INetworkEdge)(nodeList As Node(), edges As Edge(), Optional title$ = "NULL") As Graph
-            Dim Model As New Graph With {
+        Public Function Export(Of Node As INode, Edge As INetworkEdge)(nodeList As Node(), edges As Edge(), Optional title$ = "NULL") As XGMMLgraph
+            Dim Model As New XGMMLgraph With {
                     .label = "0",
                     .id = "1",
                     .directed = "1",
@@ -121,7 +121,7 @@ Namespace CytoscapeGraphView.Serialization
         Public Function Export(Of Node As FileStream.Node,
                                   Edge As FileStream.NetworkEdge)(
                                network As Network(Of Node, Edge),
-                               Optional title$ = "NULL") As Graph
+                               Optional title$ = "NULL") As XGMMLgraph
 
             Return Export(network.nodes, network.edges, title)
         End Function
@@ -144,9 +144,9 @@ Namespace CytoscapeGraphView.Serialization
                                  Edges As Edge(),
                        NodeTypeMapping As Dictionary(Of String, Type),
                        EdgeTypeMapping As Dictionary(Of String, Type),
-                              Optional Title$ = "NULL") As Graph
+                              Optional Title$ = "NULL") As XGMMLgraph
 
-            Dim Model As New Graph With {
+            Dim Model As New XGMMLgraph With {
                 .label = "0",
                 .id = "1",
                 .directed = "1",

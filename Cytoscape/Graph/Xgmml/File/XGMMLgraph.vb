@@ -59,7 +59,7 @@ Namespace CytoscapeGraphView.XGMML.File
     ''' </summary>
     ''' <remarks>请注意，由于在Cytoscape之中，每一个Xml元素都是小写字母的，所以在这个类之中的所有的Xml序列化的标记都不可以再更改大小写了</remarks>
     <XmlRoot("graph", Namespace:="http://www.cs.rpi.edu/XGMML")>
-    Public Class Graph : Implements ISaveHandle
+    Public Class XGMMLgraph : Implements ISaveHandle
 
 #Region "Assembly File Public Properties"
 
@@ -185,8 +185,8 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overloads Shared Function CreateObject() As Graph
-            Dim Graph As New Graph With {
+        Public Overloads Shared Function CreateObject() As XGMMLgraph
+            Dim Graph As New XGMMLgraph With {
                 .label = "",
                 .id = "",
                 .directed = "1",
@@ -204,17 +204,17 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overloads Shared Function CreateObject(Title As String, Type As String, Optional Description As String = "") As Graph
-            Dim Graph As Graph = Graph.CreateObject
+        Public Overloads Shared Function CreateObject(Title As String, Type As String, Optional Description As String = "") As XGMMLgraph
+            Dim Graph As XGMMLgraph = XGMMLgraph.CreateObject
 
             Graph.label = Title
-            Graph.NetworkMetaData.title = Title.Replace("<", "[").Replace(">", "]")
-            Graph.NetworkMetaData.type = Type.Replace("<", "[").Replace(">", "]")
-            Graph.NetworkMetaData.description = Description.Replace("<", "[").Replace(">", "]")
+            Graph.networkMetadata.title = Title.Replace("<", "[").Replace(">", "]")
+            Graph.networkMetadata.type = Type.Replace("<", "[").Replace(">", "]")
+            Graph.networkMetadata.description = Description.Replace("<", "[").Replace(">", "]")
             Return Graph
         End Function
 
-        Public Function DeleteDuplication() As Graph
+        Public Function DeleteDuplication() As XGMMLgraph
             Dim sw As Stopwatch = Stopwatch.StartNew
 
             Call $"{NameOf(Edges)}:={Edges.Count } in the network model...".__DEBUG_ECHO

@@ -59,7 +59,7 @@ Namespace API
         ''' <param name="g"></param>
         ''' <returns></returns>
         <Extension>
-        Public Function CreateGraph(g As Graph) As NetworkGraph
+        Public Function CreateGraph(g As XGMMLgraph) As NetworkGraph
             Dim nodes As Network.Graph.Node() =
                 LinqAPI.Exec(Of Network.Graph.Node) <= From n As XGMMLnode
                                                        In g.Nodes

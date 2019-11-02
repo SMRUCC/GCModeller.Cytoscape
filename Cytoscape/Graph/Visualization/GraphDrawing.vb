@@ -77,7 +77,7 @@ Namespace CytoscapeGraphView
         ''' <param name="size"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function InvokeDrawing(graph As Graph, size As Size) As Image
+        Public Function InvokeDrawing(graph As XGMMLgraph, size As Size) As Image
             Dim Bitmap As Bitmap = New Bitmap(size.Width, size.Height)
             Dim grSize = graph.Size
 
@@ -164,7 +164,7 @@ Namespace CytoscapeGraphView
         ''' <remarks></remarks>
         ''' 
         <Extension>
-        Public Function InvokeDrawing(Graph As Graph,
+        Public Function InvokeDrawing(Graph As XGMMLgraph,
                                       refMap As ReferenceMapData,
                                       map As String(),
                                       Optional Size As String = "",
