@@ -115,7 +115,7 @@ Namespace CytoscapeGraphView.XGMML.File
         End Property
 
         <XmlElement("att")> Public Property attributes As GraphAttribute()
-        <XmlElement("graphics")> Public Property Graphics As Graphics
+        <XmlElement("graphics")> Public Property graphics As Graphics
         <XmlElement("node")> Public Property Nodes As Node()
             Get
                 If _nodeList.IsNullOrEmpty Then

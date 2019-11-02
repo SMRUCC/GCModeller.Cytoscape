@@ -72,9 +72,9 @@ Namespace CytoscapeGraphView.XGMML
 
             Dim First As Edge = edges.First
             Dim attrs As Attribute() =
-                LinqAPI.Exec(Of Attribute) <= edges.Select(Function(x) x.Attributes)
+                LinqAPI.Exec(Of Attribute) <= edges.Select(Function(x) x.attributes)
 
-            First.Attributes = MergeAttributes(attrs)
+            First.attributes = MergeAttributes(attrs)
 
             Return First
         End Function

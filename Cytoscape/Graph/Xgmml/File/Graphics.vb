@@ -79,7 +79,7 @@ Namespace CytoscapeGraphView.XGMML.File
             }
 
             Return New Graphics With {
-                .Attributes = attrs
+                .attributes = attrs
             }
         End Function
     End Class
