@@ -70,7 +70,7 @@ Namespace CytoscapeGraphView.XGMML.File
                 If attr Is Nothing Then
                     Return {}
                 Else
-                    Return Handle.parseHandles(attr.Value)
+                    Return Handle.parseHandles(attr.Value).ToArray
                 End If
             End Get
         End Property

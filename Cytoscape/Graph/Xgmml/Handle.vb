@@ -74,7 +74,7 @@ Namespace CytoscapeGraphView.XGMML
                                 Return New Handle With {
                                     .cosTheta = parts(0),
                                     .sinTheta = parts(1),
-                                    .ratio = parts(3)
+                                    .ratio = parts(2)
                                 }
                             Else
                                 Return Nothing
