@@ -14,6 +14,13 @@ Namespace CytoscapeGraphView.XGMML
             nodeTable = g.nodes.ToDictionary(Function(n) n.label)
         End Sub
 
+        Public Function GetEdgeNodes(edge As XGMMLedge) As (source As XGMMLnode, target As XGMMLnode)
+            Dim s = GetNode(edge.source)
+            Dim t = GetNode(edge.target)
+
+            Return (s, t)
+        End Function
+
         Public Function GetEdgeBends(edge As XGMMLedge) As PointF()
             Dim [handles] As Handle() = edge.graphics.edgeBendHandles
             Dim s = GetNode(edge.source)
