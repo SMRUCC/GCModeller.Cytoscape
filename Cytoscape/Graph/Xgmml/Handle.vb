@@ -1,4 +1,6 @@
-﻿Namespace CytoscapeGraphView.XGMML
+﻿Imports System.Drawing
+
+Namespace CytoscapeGraphView.XGMML
 
     ''' <summary>
     ''' 
@@ -17,6 +19,37 @@
         Dim y# = 0
 
         Const DELIMITER As Char = ","c
+
+        ''' <summary>
+        ''' Rotate And scale the vector to the handle position
+        ''' </summary>
+        ''' <param name="sX"></param>
+        ''' <param name="sY"></param>
+        ''' <param name="tX"></param>
+        ''' <param name="tY"></param>
+        ''' <returns></returns>
+        Private Function convert(sX As Double, sY As Double, tX As Double, tY As Double) As PointF
+            ' Original edge vector v = (vx, vy). (from source to target)
+            Dim vx = tX - sX
+            Dim vy = tY - sY
+
+            ' rotate
+            Dim newX = vx * cosTheta - vy * sinTheta
+            Dim newY = vx * sinTheta + vy * cosTheta
+
+            ' New rotated vector v' = (newX, newY).
+            ' Resize vector
+            newX = newX * ratio
+            newY = newY * ratio
+
+            ' ... And this Is the New handle position.
+            Dim handleX = newX + sX
+            Dim handleY = newY + sY
+
+            Dim newPoint As New PointF(handleX, handleY)
+
+            Return newPoint
+        End Function
 
         ''' <summary>
         ''' Serialized string Is "cos,sin,ratio".
