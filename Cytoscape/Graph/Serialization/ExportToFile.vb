@@ -81,7 +81,7 @@ Namespace CytoscapeGraphView.Serialization
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function Export(Of Node As INode, Edge As INetworkEdge)(nodeList As Node(), edges As Edge(), Optional title$ = "NULL") As Graph
-            Dim Model As Graph = New Graph With {
+            Dim Model As New Graph With {
                     .Label = "0",
                     .ID = "1",
                     .Directed = "1",
@@ -110,8 +110,8 @@ Namespace CytoscapeGraphView.Serialization
                                                  EdgeTypeMapping:=GetType(Edge).GetDataFrameworkTypeSchema(False),
                                                  schema:=interMaps)
             Model.Attributes = ModelAttributes
-            Model.NetworkMetaData = New XGMML.NetworkMetadata With {
-                .Title = "GCModeller Exports: " & title,
+            Model.NetworkMetaData = New NetworkMetadata With {
+                .title = "GCModeller Exports: " & title,
                 .Description = "http://code.google.com/p/genome-in-code/cytoscape"
             }
 
@@ -154,15 +154,15 @@ Namespace CytoscapeGraphView.Serialization
                 .Directed = "1",
                 .Graphics = Graphics.DefaultValue
             }
-            Dim ModelAttributes = New XGMML.Attribute() {
-                New XGMML.Attribute With {
+            Dim ModelAttributes = New Attribute() {
+                New Attribute With {
                     .Name = ATTR_SHARED_NAME,
                     .Value = Title,
                     .Type = ATTR_VALUE_TYPE_STRING
                 },
-                New XGMML.Attribute With {
+                New Attribute With {
                     .Name = ATTR_SHARED_NAME,
-                    .Value = Title,
+                    .value = Title,
                     .Type = ATTR_VALUE_TYPE_STRING
                 }
             }
@@ -247,7 +247,7 @@ Namespace CytoscapeGraphView.Serialization
                 Return Function(null) ATTR_VALUE_TYPE_STRING
             End If
 
-            Dim CytoscapeMapping As Dictionary(Of Type, String) = XGMML.Attribute.TypeMapping
+            Dim CytoscapeMapping As Dictionary(Of Type, String) = Attribute.TypeMapping
             Dim Mapping As Func(Of String, String) =
                 Function(attrKey) __mapping(attrKey, typeMapping, CytoscapeMapping)
             Return Mapping
@@ -284,16 +284,16 @@ Namespace CytoscapeGraphView.Serialization
                 .WriteAddress  ' 生成节点数据并去除重复
         End Function
 
-        Private Function __exportNode(dict As Dictionary(Of String, String), __getType As Func(Of String, String)) As XGMML.Node
+        Private Function __exportNode(dict As Dictionary(Of String, String), __getType As Func(Of String, String)) As Node
             Dim ID As String = dict(REFLECTION_ID_MAPPING_IDENTIFIER)
-            Dim attrs As New List(Of XGMML.Attribute)
+            Dim attrs As New List(Of Attribute)
 
-            attrs += New XGMML.Attribute With {
+            attrs += New Attribute With {
                 .Name = ATTR_SHARED_NAME,
                 .Value = ID,
                 .Type = ATTR_VALUE_TYPE_STRING
             }
-            attrs += New XGMML.Attribute With {
+            attrs += New Attribute With {
                 .Name = ATTR_NAME,
                 .Value = ID,
                 .Type = ATTR_VALUE_TYPE_STRING
@@ -302,13 +302,13 @@ Namespace CytoscapeGraphView.Serialization
 
             attrs += From item As KeyValuePair(Of String, String)
                      In dict
-                     Select New XGMML.Attribute With {
+                     Select New Attribute With {
                          .Name = item.Key,
                          .Value = item.Value,
                          .Type = __getType(item.Key)
                      }
 
-            Dim node As New XGMML.Node With {
+            Dim node As New Node With {
                 .label = ID,
                 .Attributes = attrs.ToArray,
                 .Graphics = New NodeGraphics
@@ -319,14 +319,14 @@ Namespace CytoscapeGraphView.Serialization
 
         Private Function __exportEdges(Of Edge As INetworkEdge)(
                                          Edges As Edge(),
-                                         Nodes As Dictionary(Of String, XGMML.Node),
+                                         Nodes As Dictionary(Of String, Node),
                                EdgeTypeMapping As Dictionary(Of String, Type),
-                                        schema As Dictionary(Of String, String)) As XGMML.Edge()
+                                        schema As Dictionary(Of String, String)) As Edge()
 
             Dim buf = __mapNodes(Edges.ExportAsPropertyAttributes(False), schema)
             Dim typeMapping As Func(Of String, String) =
                 __createTypeMapping(EdgeTypeMapping)
-            Dim LQuery As XGMML.Edge() =
+            Dim LQuery As Edge() =
                 buf.Select(Function(x) x.__exportEdge(Nodes, typeMapping)) _
                 .WriteAddress(offset:=Nodes.Count)
             Return LQuery
@@ -348,15 +348,15 @@ Namespace CytoscapeGraphView.Serialization
         End Function
 
         <Extension>
-        Private Function __exportEdge(dict As Dictionary(Of String, String), Nodes As Dictionary(Of String, XGMML.Node), __getType As Func(Of String, String)) As XGMML.Edge
+        Private Function __exportEdge(dict As Dictionary(Of String, String), Nodes As Dictionary(Of String, Node), __getType As Func(Of String, String)) As XGMML.Edge
             Dim nodeName As String = dict(REFLECTION_ID_MAPPING_FROM_NODE)
-            Dim fromNode As XGMML.Node = Nodes.TryGetValue(nodeName)
+            Dim fromNode As Node = Nodes.TryGetValue(nodeName)
 
             If fromNode Is Nothing Then
                 Call $"fromNode '{nodeName}' could not be found in the node list!".__DEBUG_ECHO
-                fromNode = New XGMML.Node With {
+                fromNode = New Node With {
                     .label = nodeName,
-                    .id = Nodes.Count
+                    .ID = Nodes.Count
                 }
                 Call Nodes.Add(nodeName, fromNode)
                 Call $"INSERT this absence node into network...".__DEBUG_ECHO
@@ -369,7 +369,7 @@ Namespace CytoscapeGraphView.Serialization
                 Call $"toNode '{nodeName}' could not be found in the node list!".__DEBUG_ECHO
                 toNode = New XGMML.Node With {
                     .label = nodeName,
-                    .id = Nodes.Count
+                    .ID = Nodes.Count
                 }
                 Call Nodes.Add(nodeName, toNode)
                 Call $"INSERT this absence node into network...".__DEBUG_ECHO
@@ -383,17 +383,17 @@ Namespace CytoscapeGraphView.Serialization
                 New List(Of XGMML.Attribute)
             attrs += New XGMML.Attribute With {
                 .Name = ATTR_SHARED_NAME,
-                .Value = label,
+                .value = label,
                 .Type = ATTR_VALUE_TYPE_STRING
             }
             attrs += New XGMML.Attribute With {
                 .Name = ATTR_NAME,
-                .Value = label,
+                .value = label,
                 .Type = ATTR_VALUE_TYPE_STRING
             }
             attrs += New XGMML.Attribute With {
                 .Name = ATTR_SHARED_INTERACTION,
-                .Value = InteractionType,
+                .value = InteractionType,
                 .Type = ATTR_VALUE_TYPE_STRING
             }
             Call dict.Remove(REFLECTION_ID_MAPPING_FROM_NODE)
@@ -404,13 +404,13 @@ Namespace CytoscapeGraphView.Serialization
                      In dict
                      Select New XGMML.Attribute With {
                          .Name = item.Key,
-                         .Value = item.Value,
+                         .value = item.Value,
                          .Type = __getType(item.Key)
                      }
 
             Dim Node As New XGMML.Edge With {
-                    .Label = label,
-                    .source = fromNode.id,
+                    .label = label,
+                    .Source = fromNode.id,
                     .target = toNode.id,
                     .Attributes = attrs,
                     .Graphics = New EdgeGraphics

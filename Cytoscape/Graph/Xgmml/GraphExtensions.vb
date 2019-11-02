@@ -43,7 +43,7 @@
 Imports System.Runtime.CompilerServices
 Imports Microsoft.VisualBasic.Language
 Imports Microsoft.VisualBasic.Linq
-Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML
+Imports SMRUCC.genomics.Visualize.Cytoscape.CytoscapeGraphView.XGMML.File
 
 Namespace CytoscapeGraphView.XGMML
 

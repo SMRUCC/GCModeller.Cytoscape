@@ -129,26 +129,26 @@ Namespace CytoscapeGraphView.XGMML.File
             End Set
         End Property
         <XmlElement("graphics")> Public Property Graphics As Graphics
-        <XmlElement("node")> Public Property Nodes As XGMML.Node()
+        <XmlElement("node")> Public Property Nodes As Node()
             Get
                 If _nodeList.IsNullOrEmpty Then
-                    Return New XGMML.Node() {}
+                    Return New Node() {}
                 End If
                 Return _nodeList.Values.ToArray
             End Get
-            Set(value As XGMML.Node())
+            Set(value As Node())
                 If value.IsNullOrEmpty Then
-                    _nodeList = New Dictionary(Of String, XGMML.Node)
+                    _nodeList = New Dictionary(Of String, Node)
                 Else
                     _nodeList = value.ToDictionary(Function(obj) obj.label)
                 End If
             End Set
         End Property
 
-        <XmlElement("edge")> Public Property Edges As XGMML.Edge()
+        <XmlElement("edge")> Public Property Edges As Edge()
 
         Dim _attrs As Dictionary(Of GraphAttribute)
-        Dim _nodeList As Dictionary(Of String, XGMML.Node)
+        Dim _nodeList As Dictionary(Of String, Node)
 #End Region
 
         ''' <summary>
@@ -156,15 +156,15 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' </summary>
         ''' <param name="Label">Synonym</param>
         ''' <returns></returns>
-        Public Function GetNode(Label As String) As XGMML.Node
-            Dim Node As XGMML.Node = Nothing
+        Public Function GetNode(Label As String) As Node
+            Dim Node As Node = Nothing
             Call _nodeList.TryGetValue(Label, Node)
             Return Node
         End Function
 
-        Public Function GetNode(ID As Long) As XGMML.Node
-            Return LinqAPI.DefaultFirst(Of XGMML.Node) <=
-                From node As XGMML.Node
+        Public Function GetNode(ID As Long) As Node
+            Return LinqAPI.DefaultFirst(Of Node) <=
+                From node As Node
                 In Me._nodeList.Values
                 Where node.id = ID
                 Select node
@@ -216,7 +216,7 @@ Namespace CytoscapeGraphView.XGMML.File
             Return Graph
         End Function
 
-        Public Function ExistEdge(Edge As XGMML.Edge) As Boolean
+        Public Function ExistEdge(Edge As Edge) As Boolean
             Return Not (GetNode(Edge.source) Is Nothing OrElse GetNode(Edge.target) Is Nothing)
         End Function
 
