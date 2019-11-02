@@ -232,7 +232,7 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function Save(FilePath As String, encoding As Encoding) As Boolean Implements ISaveHandle.Save
-            Return WriteXml(Me.GetXml, Encodings.UTF8.CodePage, FilePath)
+            Return RDFXml.WriteXml(Me, Encodings.UTF8.CodePage, FilePath)
         End Function
 
         Public Function Save(path As String, Optional encoding As Encodings = Encodings.UTF8) As Boolean Implements ISaveHandle.Save
