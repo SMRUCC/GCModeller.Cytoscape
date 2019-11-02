@@ -63,7 +63,7 @@ Namespace CytoscapeGraphView.XGMML.File
     <XmlType("att")>
     Public Class Attribute : Implements INamedValue
 
-        <XmlAttribute("name")> Public Property Name As String Implements INamedValue.Key
+        <XmlAttribute("name")> Public Property name As String Implements INamedValue.Key
         <XmlAttribute("value")> Public Property Value As String
         <XmlAttribute("type")> Public Property Type As String
 

@@ -1,46 +1,46 @@
 ﻿#Region "Microsoft.VisualBasic::03a50492fe2e8a313020230617709063, visualize\Cytoscape\Cytoscape\Graph\Xgmml\Graph.vb"
 
-    ' Author:
-    ' 
-    '       asuka (amethyst.asuka@gcmodeller.org)
-    '       xie (genetics@smrucc.org)
-    '       xieguigang (xie.guigang@live.com)
-    ' 
-    ' Copyright (c) 2018 GPL3 Licensed
-    ' 
-    ' 
-    ' GNU GENERAL PUBLIC LICENSE (GPL3)
-    ' 
-    ' 
-    ' This program is free software: you can redistribute it and/or modify
-    ' it under the terms of the GNU General Public License as published by
-    ' the Free Software Foundation, either version 3 of the License, or
-    ' (at your option) any later version.
-    ' 
-    ' This program is distributed in the hope that it will be useful,
-    ' but WITHOUT ANY WARRANTY; without even the implied warranty of
-    ' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    ' GNU General Public License for more details.
-    ' 
-    ' You should have received a copy of the GNU General Public License
-    ' along with this program. If not, see <http://www.gnu.org/licenses/>.
+' Author:
+' 
+'       asuka (amethyst.asuka@gcmodeller.org)
+'       xie (genetics@smrucc.org)
+'       xieguigang (xie.guigang@live.com)
+' 
+' Copyright (c) 2018 GPL3 Licensed
+' 
+' 
+' GNU GENERAL PUBLIC LICENSE (GPL3)
+' 
+' 
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+' 
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+' 
+' You should have received a copy of the GNU General Public License
+' along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 
-    ' /********************************************************************************/
+' /********************************************************************************/
 
-    ' Summaries:
+' Summaries:
 
-    '     Class Graph
-    ' 
-    '         Properties: Attributes, Directed, documentVersion, Edges, Graphics
-    '                     ID, Label, NetworkMetaData, Nodes, Size
-    ' 
-    '         Function: (+2 Overloads) CreateObject, DeleteDuplication, ExistEdge, (+2 Overloads) GetNode, GetSize
-    '                   Load, (+2 Overloads) Save
-    ' 
-    ' 
-    ' /********************************************************************************/
+'     Class Graph
+' 
+'         Properties: Attributes, Directed, documentVersion, Edges, Graphics
+'                     ID, Label, NetworkMetaData, Nodes, Size
+' 
+'         Function: (+2 Overloads) CreateObject, DeleteDuplication, ExistEdge, (+2 Overloads) GetNode, GetSize
+'                   Load, (+2 Overloads) Save
+' 
+' 
+' /********************************************************************************/
 
 #End Region
 
@@ -50,6 +50,7 @@ Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic.ComponentModel
 Imports Microsoft.VisualBasic.ComponentModel.Collection
 Imports Microsoft.VisualBasic.Language
+Imports Microsoft.VisualBasic.MIME.application
 Imports Microsoft.VisualBasic.Text
 
 Namespace CytoscapeGraphView.XGMML.File
@@ -63,14 +64,14 @@ Namespace CytoscapeGraphView.XGMML.File
 
 #Region "Assembly File Public Properties"
 
-        <XmlAttribute("id")> Public Property ID As String
+        <XmlAttribute("id")> Public Property id As String
         ''' <summary>
         ''' The brief title information of this cytoscape network model.(这个Cytoscape网络模型文件的摘要标题信息)
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <XmlAttribute("label")> Public Property Label As String
+        <XmlAttribute("label")> Public Property label As String
         ''' <summary>
         ''' The edges between these nodes have the direction from one node to another node?
         ''' (这个网络模型文件之中的相互作用的节点之间的边是否是具有方向性的)
@@ -78,8 +79,9 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <XmlAttribute("directed")> Public Property Directed As String
-        <XmlAttribute("cy-documentVersion")> Public Property documentVersion As String = "3.0"
+        <XmlAttribute("directed")> Public Property directed As String
+        <XmlAttribute("documentVersion", [Namespace]:=xmlnsCytoscape)>
+        Public Property documentVersion As String = "3.0"
 
         ''' <summary>
         ''' 在这个属性里面会自动设置Graph对象的属性列表里面的数据
@@ -112,22 +114,7 @@ Namespace CytoscapeGraphView.XGMML.File
             End Set
         End Property
 
-        <XmlElement("att")> Public Property Attributes As GraphAttribute()
-            Get
-                If _attrs.IsNullOrEmpty Then
-                    Return New GraphAttribute() {}
-                End If
-
-                Return _attrs.Values.ToArray
-            End Get
-            Set(value As GraphAttribute())
-                If value.IsNullOrEmpty Then
-                    _attrs = New Dictionary(Of GraphAttribute)
-                Else
-                    _attrs = value.ToDictionary
-                End If
-            End Set
-        End Property
+        <XmlElement("att")> Public Property attributes As GraphAttribute()
         <XmlElement("graphics")> Public Property Graphics As Graphics
         <XmlElement("node")> Public Property Nodes As Node()
             Get
@@ -147,8 +134,28 @@ Namespace CytoscapeGraphView.XGMML.File
 
         <XmlElement("edge")> Public Property Edges As Edge()
 
-        Dim _attrs As Dictionary(Of GraphAttribute)
         Dim _nodeList As Dictionary(Of String, Node)
+
+        <XmlNamespaceDeclarations()>
+        Public xmlns As XmlSerializerNamespaces
+
+        ''' <summary>
+        ''' cy:xxx
+        ''' </summary>
+        Public Const xmlnsCytoscape$ = "http://www.cytoscape.org"
+        ''' <summary>
+        ''' dc:xxx
+        ''' </summary>
+        Public Const xmlns_dc$ = "http://purl.org/dc/elements/1.1/"
+
+        Public Sub New()
+            xmlns = New XmlSerializerNamespaces
+
+            xmlns.Add("cy", xmlnsCytoscape)
+            xmlns.Add("rdf", rdf_xml.RDF.XmlnsNamespace)
+            xmlns.Add("xlink", "http://www.w3.org/1999/xlink")
+            xmlns.Add("dc", xmlns_dc)
+        End Sub
 #End Region
 
         ''' <summary>
@@ -208,9 +215,9 @@ Namespace CytoscapeGraphView.XGMML.File
         ''' <remarks></remarks>
         Public Overloads Shared Function CreateObject() As Graph
             Dim Graph As New Graph With {
-                .Label = "",
-                .ID = "",
-                .Directed = "1",
+                .label = "",
+                .id = "",
+                .directed = "1",
                 .NetworkMetaData = New NetworkMetadata
             }
             Return Graph
@@ -228,10 +235,10 @@ Namespace CytoscapeGraphView.XGMML.File
         Public Overloads Shared Function CreateObject(Title As String, Type As String, Optional Description As String = "") As Graph
             Dim Graph As Graph = Graph.CreateObject
 
-            Graph.Label = Title
+            Graph.label = Title
             Graph.NetworkMetaData.Title = Title.Replace("<", "[").Replace(">", "]")
-            Graph.NetworkMetaData.InteractionType = Type.Replace("<", "[").Replace(">", "]")
-            Graph.NetworkMetaData.Description = Description.Replace("<", "[").Replace(">", "]")
+            Graph.NetworkMetaData.type = Type.Replace("<", "[").Replace(">", "]")
+            Graph.NetworkMetaData.description = Description.Replace("<", "[").Replace(">", "]")
             Return Graph
         End Function
 
